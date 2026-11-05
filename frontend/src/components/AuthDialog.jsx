@@ -10,7 +10,7 @@ export default function AuthDialog({ onClose, onSubmit, error, busy, initialMode
   const change = (key) => (event) => setForm((current) => ({ ...current, [key]: event.target.value }))
 
   return <AnimatePresence><motion.div className="auth-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-    <motion.section role="dialog" aria-modal="true" aria-labelledby="auth-title" className="auth-card" initial={{ opacity: 0, y: 12, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: .98 }}>
+    <motion.section role="dialog" aria-modal="true" aria-labelledby="auth-title" className={`auth-card ${register ? 'auth-register' : 'auth-login'}`} initial={{ opacity: 0, y: 12, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 8, scale: .98 }}>
       <button className="icon-button auth-close" aria-label="Close" onClick={onClose}><X size={17} /></button>
       <div className="auth-brand"><div className="brand-mark"><Sparkles size={18} fill="currentColor" /></div><span>algo<span>quest</span></span></div>
       <div className="panel-kicker">{register ? 'BEGIN YOUR ADVENTURE' : 'WELCOME BACK, QUESTer'}</div>
