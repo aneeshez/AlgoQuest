@@ -23,6 +23,10 @@ Keep one new idea per lesson. Use worked examples before asking learners to solv
 
 ## 2. Course structure
 
+### Starter content coverage
+
+The seed data currently provides twelve authored starter lessons: Variables and values, Loops and repetition, Big O notation, and Conditions and decisions in Basics; Dictionaries as lookup tables, Set membership, Frequency counting, and Hash maps and collisions in Medium; Binary tree anatomy, Depth-first traversal, Graph representations, and Breadth-first search in Advanced. The remaining seed entries are drafts and must not be represented as fully edited lessons. Automated checks confirm that these twelve Python examples compile and that their checks have four options with valid answer indices; editorial review against the full lesson pattern above remains outstanding.
+
 The top-level navigation contains Basics, Medium, and Advanced. Sections are all open from the start; learners can follow the recommended route or choose a topic. Show prerequisite suggestions without locking content. Add a short placement/self-check to recommend a starting point, not to block access.
 
 The existing seed data has ten worlds. The following map preserves that base while grouping it into the three user-selected sections.

@@ -1,5 +1,8 @@
+from datetime import timedelta
 from django.contrib.auth.models import User
+from django.core.management import call_command
 from django.test import TestCase
+from django.utils import timezone
 from rest_framework.test import APIClient
 from apps.accounts.models import UserProfile
 from apps.gamification.models import XPTransaction
@@ -33,9 +36,34 @@ class LessonProgressTests(TestCase):
         self.assertEqual(first.status_code, 200)
         self.assertEqual(second.status_code, 200)
         self.assertEqual(UserProfile.objects.get(user=self.user).total_xp, 20)
+        self.assertEqual(UserProfile.objects.get(user=self.user).streak_days, 1)
+        self.assertEqual(UserProfile.objects.get(user=self.user).last_activity_date, timezone.localdate())
         self.assertEqual(XPTransaction.objects.filter(user=self.user).count(), 1)
         self.assertEqual(LessonProgress.objects.filter(user=self.user).count(), 1)
         self.assertEqual(list(UserBadge.objects.filter(user=self.user).values_list("badge__slug", flat=True)), ["first-steps"])
+
+    def test_consecutive_activity_advances_streak_and_longest_record(self):
+        profile = self.user.profile
+        profile.streak_days = 4
+        profile.longest_streak = 4
+        profile.last_activity_date = timezone.localdate() - timedelta(days=1)
+        profile.save()
+        self.client.post(f"/api/progress/lessons/{self.lesson.pk}/", {"action": "complete"}, format="json")
+        profile.refresh_from_db()
+        self.assertEqual(profile.streak_days, 5)
+        self.assertEqual(profile.longest_streak, 5)
+        self.assertEqual(profile.last_activity_date, timezone.localdate())
+
+    def test_a_missed_day_restarts_current_streak_without_erasing_best(self):
+        profile = self.user.profile
+        profile.streak_days = 5
+        profile.longest_streak = 8
+        profile.last_activity_date = timezone.localdate() - timedelta(days=2)
+        profile.save()
+        self.client.post(f"/api/progress/lessons/{self.lesson.pk}/", {"action": "complete"}, format="json")
+        profile.refresh_from_db()
+        self.assertEqual(profile.streak_days, 1)
+        self.assertEqual(profile.longest_streak, 8)
 
     def test_check_returns_explanation_without_exposing_answer_in_lesson_json(self):
         lesson_data = APIClient().get(f"/api/lessons/{self.lesson.slug}/").json()
@@ -43,3 +71,28 @@ class LessonProgressTests(TestCase):
         self.assertNotIn("check_explanation", lesson_data)
         result = self.client.post(f"/api/progress/lessons/{self.lesson.pk}/", {"action": "check", "answer": 1}, format="json")
         self.assertEqual(result.json(), {"correct": True, "explanation": "Addition gives four."})
+
+
+class StarterCurriculumContentTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command("seed_curriculum", verbosity=0)
+
+    def test_four_lessons_per_section_have_authored_executable_examples(self):
+        authored = {
+            "basics": ["Variables and values", "Loops and repetition", "Big O notation", "Conditions and decisions"],
+            "medium": ["Dictionaries as lookup tables", "Set membership", "Frequency counting", "Hash maps and collisions"],
+            "advanced": ["Binary tree anatomy", "Depth-first traversal", "Graph representations", "Breadth-first search"],
+        }
+        for section, titles in authored.items():
+            lessons = list(Lesson.objects.filter(module__section=section, title__in=titles))
+            self.assertEqual(len(lessons), 4, msg=f"Expected four authored lessons in {section}.")
+            for lesson in lessons:
+                self.assertNotIn("is a core idea", lesson.concept)
+                self.assertTrue(lesson.analogy)
+                self.assertTrue(lesson.steps)
+                self.assertTrue(lesson.dry_run)
+                self.assertTrue(lesson.assignment_prompt)
+                self.assertEqual(len(lesson.check_options), 4)
+                self.assertLess(lesson.check_answer, len(lesson.check_options))
+                compile(lesson.python_code, f"{lesson.slug}.py", "exec")

@@ -8,7 +8,7 @@ The product requirements, curriculum design, architecture, data model/API plan, 
 
 ## Current status
 
-Foundation plus a working learning and practice MVP: responsive marketing landing page, learner dashboard with backend-backed XP and curriculum completion, ten API-backed curriculum worlds, lesson bookmarks/checks/completion, idempotent lesson XP, eight interactive games, and a Monaco coding arena with Pyodide in a terminable browser worker. Three foundation/complexity lessons have fully authored teaching material; the other seeded lessons are first drafts that need editorial expansion. The coding arena currently runs visible examples only in the browser; passing results do not award server XP and hidden judge tests are not connected. Streaks are stored but not yet advanced from activity, and achievements, daily missions, assignments history, leaderboard, full analytics, and admin content workflows remain to be implemented. This is not a deployed service and has no production secrets configured.
+Foundation plus a working learning and practice MVP: responsive marketing landing page, learner dashboard with backend-backed XP and curriculum completion, ten API-backed curriculum worlds grouped into open Basics/Medium/Advanced sections, lesson bookmarks/checks/completion, idempotent lesson XP, daily activity streaks, three lesson milestone badges, a nickname-based weekly leaderboard, eight interactive games, and a Monaco coding arena with Pyodide in a terminable browser worker. Twelve lessons have authored teaching material (four per section); the rest need editorial expansion. The coding arena runs visible examples only in the browser; passing results do not award server XP and hidden judge tests are not connected. Leaderboard opt-out/reporting, daily missions, assignment history, full analytics, and admin content workflows remain to be implemented. This is not a deployed service and has no production secrets configured.
 
 ## Run locally
 
@@ -68,6 +68,6 @@ Browser code execution runs in a Pyodide Web Worker with a 2.5 second execution 
 3. Ten-world roadmap and tutorial engine (initial slice complete; expand lesson quality and assessments)
 4. Eight interactive mini-games (MVP interactions complete; progression persistence remains)
 5. Coding arena and Pyodide worker (visible examples complete; submission history and secure hidden judge remain)
-6. XP, streaks, achievements, daily missions, and leaderboards (XP for lessons complete; other systems remain)
+6. XP, streaks, achievements, daily missions, and leaderboards (lesson XP, streak advancement, starter badges, and weekly leaderboard complete; broader gamification remains)
 7. Admin content tools and learner analytics (remaining)
 8. Responsive/security review, automated checks, and deployment documentation (automated local checks complete; production review and deployment remain)

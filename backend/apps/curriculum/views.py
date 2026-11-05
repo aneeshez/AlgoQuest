@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import generics, permissions
@@ -51,7 +52,12 @@ def lesson_progress(request, pk):
             XPTransaction.objects.get_or_create(user=request.user, activity_ref=f"lesson:{lesson.id}", defaults={"amount": lesson.xp_reward, "reason": "lesson_completed"})
             profile = UserProfile.objects.select_for_update().get(user=request.user)
             profile.total_xp = sum(request.user.xp_transactions.values_list("amount", flat=True))
-            profile.save(update_fields=["total_xp"])
+            today = timezone.localdate()
+            if profile.last_activity_date != today:
+                profile.streak_days = profile.streak_days + 1 if profile.last_activity_date == today - timedelta(days=1) else 1
+                profile.longest_streak = max(profile.longest_streak, profile.streak_days)
+                profile.last_activity_date = today
+            profile.save(update_fields=["total_xp", "streak_days", "longest_streak", "last_activity_date"])
         if action == "complete":
             award_lesson_badges(request.user)
     return Response({"completed": bool(progress.completed_at), "bookmarked": progress.bookmarked, "totalXp": request.user.profile.total_xp})
