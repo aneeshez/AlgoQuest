@@ -8,7 +8,7 @@ The product requirements, curriculum design, architecture, data model/API plan, 
 
 ## Current status
 
-Foundation plus a working learning and practice MVP: responsive marketing landing page, learner dashboard with backend-backed XP and curriculum completion, ten API-backed curriculum worlds grouped into open Basics/Medium/Advanced sections, lesson bookmarks/checks/completion, idempotent lesson XP, daily activity streaks, three lesson milestone badges, a nickname-based weekly leaderboard with learner hide and nickname reports, eight interactive mini-games, a saved three-step story quest, and a Monaco coding arena with Pyodide in a terminable browser worker. All 42 seed lessons have authored teaching content; editorial and assessment review remains before public launch. Logged-in learners can earn 10 casual XP per coding task per day, capped at 40 daily, and 15 XP once for completing the story quest; coding rewards rely on visible browser checks and are not cheat-proof. Hidden judge tests are not connected. More story quests, daily missions, assignment history, full analytics, audit logs, and broader admin content workflows remain to be implemented. This is not a deployed service and has no production secrets configured.
+Foundation plus a working learning and practice MVP: responsive landing page, learner dashboard, ten curriculum worlds, lesson bookmarks/checks/completion, XP, streaks and badges, a nickname-based weekly leaderboard, eight mini-games, a saved story quest, and a Monaco coding arena using Pyodide in a terminable browser worker. All 42 seed lessons have authored teaching content; editorial and assessment review remains before public launch. Coding rewards rely on visible browser checks and are not cheat-proof. Hidden judge tests are not connected. More story quests, daily missions, assignment history, full analytics, audit logs, and broader admin content workflows remain to be implemented. AlgoQuest is an early friends beta, not a public competitive service. Production deployment requires an external PostgreSQL database and authenticated hosting accounts; see `docs/07-deployment-and-operations.md`.
 
 ## Run locally
 
@@ -48,7 +48,7 @@ python manage.py test
 python manage.py check
 ```
 
-Set `DATABASE_URL` to a PostgreSQL connection string to use PostgreSQL. Set a strong `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=false`, `DJANGO_ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, and `CSRF_TRUSTED_ORIGINS` before deployment.
+Use `backend/.env.example` as a template for production settings. Set a strong `DJANGO_SECRET_KEY`, `DJANGO_DEBUG=false`, exact `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`, and `CSRF_TRUSTED_ORIGINS` before deployment. Production settings fail closed if the secret, database URL, or allowed hosts are missing.
 
 ## Architecture
 
