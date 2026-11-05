@@ -10,35 +10,40 @@ The repository README lists Node.js 20+, Python 3.12+, and npm. Start the Vite c
 
 ## 3. Leading deployment option
 
-Candidate: React/Vite and Django on Vercel Hobby with Supabase PostgreSQL. As checked on 2026-11-05:
+Leading candidate: React/Vite and Django through Vercel Hobby with Supabase PostgreSQL, subject to one-origin proof. Render Free is a fallback for a small beta, not a production availability solution. As checked on 2026-11-05:
 
-- Vercel documents Django support and a Python runtime, but the Python runtime documentation labels it beta. Prove compatibility with this monorepo and the exact session/database flows before relying on it.
-- Vercel Hobby is for personal, non-commercial use. It has included usage limits; the deployment can be paused when limits are exceeded. It is not an uptime SLA.
-- Supabase Free lists two active projects, 500 MB database size, 5 GB egress, and up to 50,000 monthly active users. Free projects may pause after one week of low activity. Automatic backups are not included on Free.
-- A no-custom-domain deployment can use provider subdomains, but browser session, CSRF, CORS, and redirect behavior must be tested on the actual deployed URLs.
+- Vercel Python is generally available and supports Django. Vercel Services can deploy the React and Django directories under one project and domain, but Services are still beta. Hobby is free for personal, non-commercial use; listed limits include 1,000,000 function invocations, 4 active CPU-hours, 360 GB-hours of provisioned memory, and 100 GB fast data transfer. Most exceeded Hobby limits pause the affected feature until the next 30-day window. No uptime SLA is included.
+- Supabase Free allows two active projects across the account, 500 MB database per project, 50,000 monthly active users, and separate 5 GB cached and 5 GB uncached egress quotas. Projects with low database activity over seven days may pause; a paused project can be restored for up to one year. Free has no automatic daily database backups; use manual exports and an off-site copy.
+- Render Free can run Django and static sites. A free web service sleeps after 15 idle minutes, takes about one minute to wake on a request, has 750 free instance hours per workspace per month, and has ephemeral local storage. Render says free services are for testing/hobby work, not production applications. Render Free Postgres expires after 30 days and has no backups; use Supabase if the app uses Render only for the web process.
+- The first deployment can use provider subdomains without a custom domain. Keep the React app and Django API same-origin if possible so session cookies and CSRF work consistently in browsers.
 
 Sources checked:
 
 - [Vercel Hobby plan](https://vercel.com/docs/plans/hobby)
-- [Vercel Django support announcement](https://vercel.com/changelog/zero-configuration-django-support)
+- [Vercel Python generally available](https://vercel.com/changelog/python-on-vercel-is-now-generally-available)
 - [Vercel Python runtime](https://vercel.com/docs/functions/runtimes/python)
+- [Vercel Services (beta)](https://vercel.com/docs/services)
 - [Supabase pricing](https://supabase.com/pricing)
-- [Supabase free project behavior](https://supabase.com/kb/faqs/platform/free-postgres-for-side-projects)
+- [Supabase project pausing](https://supabase.com/docs/guides/platform/free-project-pausing)
+- [Supabase backups](https://supabase.com/docs/guides/platform/backups)
 - [Supabase billing and free-plan quotas](https://supabase.com/docs/guides/platform/billing-on-supabase)
+- [Supabase database connections](https://supabase.com/docs/guides/database/connecting-to-postgres)
+- [Render free service limits](https://render.com/docs/free)
+- [Render Django deployment](https://render.com/docs/deploy-django)
 
-These are a dated snapshot, not a promise. Vercel and Supabase may change prices, quotas, pausing behavior, or terms. Confirm exact limits in the provider dashboards and current docs immediately before deployment. Disable auto-recharge and avoid entering a payment method if the account must remain strictly free.
+These are a dated snapshot, not a promise. Vercel, Render, and Supabase may change prices, quotas, pausing behavior, or terms. Confirm exact limits in the provider dashboards and current docs immediately before deployment. Do not add a payment method or enable paid usage if the account must remain strictly free.
 
 ## 4. Deployment release checklist
 
 ### Before first deploy
 
-- Confirm Vercel Hobby personal/non-commercial eligibility for the intended use.
+- Confirm Vercel Hobby personal/non-commercial eligibility for the intended use and whether Vercel Services beta access is available for this account. If not, test the same-origin Render shape against its cold-start trade-off.
 - Create separate development and launch Supabase projects if within the two-project free limit; do not use production data in previews.
 - Configure Django environment values: strong DJANGO_SECRET_KEY, DEBUG false, exact ALLOWED_HOSTS, DATABASE_URL, exact CSRF_TRUSTED_ORIGINS, and exact CORS_ALLOWED_ORIGINS if separate origins are required.
 - Configure secure cookies, HTTPS/proxy behavior, static assets, host redirects, and error pages.
 - Use the Supabase serverless-appropriate connection method, SSL, and bounded pool sizes. Never place database credentials in frontend environment variables.
 - Run schema migrations once as a controlled release action. Seed only repeatable, published content. Avoid concurrent migration at function startup.
-- Deploy a vertical slice and verify registration, login, CSRF, progress persistence, database pooling, Pyodide assets, and leaderboard query from the real domain.
+- Deploy a vertical slice and verify registration, login, CSRF, progress persistence, database pooling, Pyodide assets, and leaderboard query from the provider subdomain before inviting friends.
 - Test service pause/quota messaging and how learners are informed if the free service is temporarily unavailable.
 
 ### Environment variable inventory
@@ -70,7 +75,7 @@ For the small beta, review provider usage, database size, failed logins, API err
 
 ## 7. Fallback plan
 
-If Vercel Django support fails compatibility, do not assume Netlify can host the Django backend; its documented function workflow is JavaScript/TypeScript and Go. A separate Django host can be considered, but a free Render web service currently sleeps after 15 idle minutes and Render describes free services as non-production. Any fallback must be rechecked against the zero-cost, session, database, and availability requirements before it is selected.
+If the Vercel one-origin proof fails, use the documented Render fallback only for a limited friends beta that accepts cold starts and best-effort availability. Do not split the React and Django sites across unrelated domains until cross-site cookie and browser privacy behavior has been verified. Recheck the zero-cost, session, database, and availability requirements before selecting any alternative.
 
 ## 8. Production-readiness gate
 

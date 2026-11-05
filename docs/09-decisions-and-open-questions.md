@@ -36,7 +36,7 @@ This log captures user-confirmed decisions and proposed defaults. A proposed def
 | P-03 | Keep earned badges and lifetime points permanently; reset only the weekly leaderboard aggregation. | Preserves achievement history while giving weekly newcomers a fresh contest. |
 | P-04 | (Implemented) Provide a learner hide control while still allowing course participation. | Added as a privacy control while keeping the requested global leaderboard. |
 | P-05 | Use a minimum of four fully edited lessons and one aligned interactive activity per section for the first limited beta. | Keeps all three sections useful without publishing draft content. |
-| P-06 | Treat Vercel Django/Python support as a deployment experiment until the project-specific proof passes. | Current runtime documentation labels Python beta. |
+| P-06 | Treat Vercel as a deployment candidate until the monorepo/session proof passes; Python is GA but Vercel Services remains beta. | Current official docs distinguish the Python runtime from multi-service deployment. |
 
 ## Open questions and risks
 
@@ -46,7 +46,7 @@ This log captures user-confirmed decisions and proposed defaults. A proposed def
 4. **Support channel:** Which private contact method should be shown for account recovery and reporting? Do not publish a personal address without an intentional choice.
 5. **Content minimum:** Confirm whether the proposed four reviewed lessons per section is sufficient for a limited beta, or whether every seeded lesson must be fully authored first.
 6. **Age range:** Confirm whether the app is intended for children or only teens/adults before finalizing account fields, privacy notice, and public profiles.
-7. **Hosting proof:** Vercel's Django/Python runtime is beta and Vercel Hobby is personal/non-commercial with usage limits. If compatibility or terms fail, revisit the stack/availability expectation without adding paid services.
+7. **Hosting proof:** Vercel Python is generally available, but Services is beta; Hobby is personal/non-commercial with usage limits. Render Free has a one-minute cold start after 15 minutes idle. Test one-origin login/CSRF/database behavior and choose the acceptable free-tier trade-off before deployment.
 8. **Database continuity:** Supabase Free has quotas, may pause after inactivity, and does not include automatic backups in the current pricing table. Decide who exports data and how often before real learner progress matters.
 9. **Score abuse:** Browser code execution cannot provide a cheat-proof public score. The accepted policy is casual points, basic caps, anomaly review, and no prizes; a competitive mode requires a separate judge design.
 10. **Moderation operations:** The app now supports learner hide, limited nickname reports, and a Django admin review queue. Choose a private support contact and a reasonable response process before broad public signup.
@@ -56,6 +56,7 @@ This log captures user-confirmed decisions and proposed defaults. A proposed def
 Verified against official provider pages on 2026-11-05. These facts can change; re-check before deployment.
 
 - Vercel Hobby personal/non-commercial terms and usage: [Vercel Hobby plan](https://vercel.com/docs/plans/hobby).
-- Vercel Django support and Python runtime beta: [Django support](https://vercel.com/changelog/zero-configuration-django-support), [Python runtime](https://vercel.com/docs/functions/runtimes/python).
+- Vercel Python GA, Django support, and Services beta: [Python GA](https://vercel.com/changelog/python-on-vercel-is-now-generally-available), [Python runtime](https://vercel.com/docs/functions/runtimes/python), [Services](https://vercel.com/docs/services).
 - Supabase Free quotas and pause behavior: [pricing](https://supabase.com/pricing), [free Postgres FAQ](https://supabase.com/kb/faqs/platform/free-postgres-for-side-projects), [billing guide](https://supabase.com/docs/guides/platform/billing-on-supabase).
+- Render Free sleep and storage limits: [free instances](https://render.com/docs/free), [Django guide](https://render.com/docs/deploy-django).
 - Pyodide browser execution: [usage docs](https://pyodide.org/en/stable/usage/index.html), [Web Worker docs](https://pyodide.org/en/latest/usage/webworker.html).

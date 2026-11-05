@@ -5,11 +5,11 @@
 | Concern | Decision | Benefit | Trade-off / complexity |
 | --- | --- | --- | --- |
 | Browser UI | React with JavaScript | Broad ecosystem and direct fit for an interactive web UI. | React state, routing, and API behavior need clear conventions. |
-| Server | Python with Django and Django REST Framework | Python matches the learner language and Django provides authentication, admin, ORM, and security tools. | Separate API and client integration; Django must be adapted to serverless hosting if deployed on Vercel. |
+| Server | Python with Django and Django REST Framework | Python matches the learner language and Django provides authentication, admin, ORM, and security tools. | Separate API and client integration; verify routing, sessions, and database connections in the selected hosting shape. |
 | Database | Supabase PostgreSQL | Managed PostgreSQL with a free tier and standard Django driver support. | Free projects can pause; quotas and connection limits apply. Supabase is the database here, not the selected authentication system. |
 | Authentication | Django username/password sessions | Directly supports the requested username sign-in and keeps authentication in one server. | Cookie, CSRF, CORS, and account recovery need careful configuration. |
 | Python execution | Pyodide in a browser Web Worker | No code-execution server cost; UI remains responsive when worker and timeout controls are used. | Browser support/startup size and platform limits; result checks are not trusted for competition-grade scores. |
-| Hosting | Vercel Hobby is the leading candidate for personal, non-commercial use | Can host React assets and currently documents Django support through a Python runtime. | Python runtime is beta; serverless limits apply; free plan is not an uptime guarantee and is restricted to personal/non-commercial use. |
+| Hosting | Vercel Hobby is the leading candidate for personal, non-commercial use; Render Free is a fallback | Vercel Python is generally available and recognizes Django; Vercel Services can route a frontend and backend on one domain. | Vercel Services remain beta. Render Free has cold starts and is explicitly not for production applications. Neither free option provides a production availability guarantee. |
 | Budget | $0 required for initial MVP | Fits the stated constraint. | Free tiers can pause, cap usage, or change; no dependable production SLA is assumed. |
 
 ## 2. Target system shape
@@ -34,7 +34,7 @@ The repository README reports that the current deployment is not production conf
 
 ## 4. Hosting compatibility gate
 
-Vercel documents zero-configuration Django deployment and a Python function runtime, but its current Python runtime documentation labels the runtime beta. Before selecting it for even the friends beta, deploy a minimal vertical slice and verify:
+As of 2026-11-05, Vercel's Python runtime is generally available and recognizes Django. Its Vercel Services feature can route a JavaScript frontend and Python backend on one project/domain, but Services are still beta on all plans. Before selecting this for the friends beta, build and verify a minimal vertical slice:
 
 1. Vercel builds the existing frontend and Django monorepo as expected.
 2. Django URL routing, sessions, CSRF, migrations, and static assets work in the deployed shape.
@@ -42,11 +42,11 @@ Vercel documents zero-configuration Django deployment and a Python function runt
 4. Login, logout, lesson progress, and leaderboard queries survive separate function invocations.
 5. Runtime/build limits and Vercel Hobby terms still fit the use case.
 
-If the monorepo cannot be deployed cleanly as one app, evaluate a Vercel static frontend plus a separate Django API host. Render Free is a useful preview option but its current docs say free web services sleep after 15 minutes and are not for production. That option does not satisfy always-on expectations. Do not silently introduce a paid service.
+If the Vercel multi-service path is unavailable or unstable, Render Free can host a single Django web service that serves the built React files from the same origin, with Supabase as the durable database. Render spins a free web service down after 15 minutes idle; its next request takes about a minute to wake it. Render explicitly says not to use its Free instances for production applications. Do not silently introduce a paid service or use Render's 30-day free Postgres database for learner data.
 
 ## 5. Serverless database behavior
 
-Use Supabase's PostgreSQL connection string/pooler suitable for serverless requests. Require SSL, keep application connection counts low, avoid long-lived stale connections, and test concurrent requests. For request-scoped functions, prefer closing Django connections after requests and using the transaction pooler as appropriate. Run migrations as a controlled release step, not concurrently on every function startup.
+Use Supabase's PostgreSQL connection string/pooler suitable for the chosen runtime. For serverless requests, Supabase recommends its shared transaction pooler; keep application connection counts low, turn off prepared statements where unsupported, require SSL, avoid long-lived stale connections, and test concurrent requests. For a persistent Render web process, confirm IPv4/IPv6 reachability and choose the matching shared pooler mode. Run migrations as a controlled release step, not concurrently on every function startup.
 
 Do not depend on local files for durable state. Serverless local storage is temporary. User content, progress, scores, and sessions must live in PostgreSQL or another explicitly approved persistent store. Static assets can be deployed with the frontend.
 

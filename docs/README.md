@@ -18,7 +18,7 @@ This package defines the product, learning experience, architecture, security, Q
 
 AlgoQuest is an English-language web app for learning data structures and algorithms through clear lessons, visual explanations, Python practice, assignments, and scenario-based games. It supports absolute beginners as well as learners who already know programming. Learners can enter Basics, Medium, or Advanced in any order. The intended curriculum aims for balanced DSA mastery with interview practice.
 
-The chosen direction is a React and JavaScript client, a Django and Python API, Supabase PostgreSQL, username and password accounts, browser-based Python execution, and Vercel Hobby as the leading hosting candidate for a personal, non-commercial launch. The initial budget is zero. The global weekly leaderboard is casual, uses nicknames, and is not a verified measure of skill.
+The chosen direction is a React and JavaScript client, a Django and Python API, Supabase PostgreSQL, username and password accounts, and browser-based Python execution. Vercel Hobby is the leading hosting candidate for a personal, non-commercial launch, with Vercel Services beta access and same-origin session behavior still to prove; Render Free is a sleeping-service fallback. The initial budget is zero. The global weekly leaderboard is casual, uses nicknames, and is not a verified measure of skill.
 
 ## Existing project status
 
@@ -28,4 +28,4 @@ The implementation milestones so far passed the current Django suite (22 tests),
 
 ## How to use these documents
 
-Build and review against the requirements and acceptance criteria. Update the decision log when a product choice changes. Re-check provider limits and deployment compatibility immediately before deployment; free plans and beta runtimes can change. No provider choice or this documentation package alone establishes production readiness.
+Build and review against the requirements and acceptance criteria. Update the decision log when a product choice changes. Re-check provider limits and deployment compatibility immediately before deployment; free plans and beta features can change. No provider choice or this documentation package alone establishes production readiness.
