@@ -238,3 +238,126 @@ button,select,input{min-height:44px}
   .demo-bottom{font-size:9px}
   .landing-nav-actions .primary-button{white-space:nowrap}
 }
+
+/* Use the available viewport width and keep every learning surface readable. */
+#root>.min-h-screen>.relative{width:100%;max-width:none}
+.content-wrap{width:100%;max-width:none;padding-left:clamp(24px,3vw,60px);padding-right:clamp(24px,3vw,60px)}
+.landing-page{width:100%;max-width:none;padding-left:clamp(24px,3vw,56px);padding-right:clamp(24px,3vw,56px)}
+.roadmap-page,.lesson-page,.gamehub,.arena-page{width:100%;max-width:1500px;margin-inline:auto}
+.landing-hero{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:clamp(42px,5vw,84px);padding-top:clamp(48px,5vw,90px)}
+.landing-copy h1{font-size:clamp(62px,5.6vw,102px);max-width:920px}
+.hero-demo{padding:clamp(24px,2vw,34px)}
+.demo-question{font-size:clamp(19px,1.35vw,24px)}
+.demo-code{font-size:clamp(14px,1vw,17px);padding:18px}
+.demo-array span{width:clamp(48px,3.3vw,62px);height:clamp(48px,3.3vw,62px);font-size:16px}
+.demo-answer strong{font-size:17px}
+.demo-bottom{font-size:12px}
+.landing-copy>p,.landing-section-heading>p,.play-section>div:first-child>p,.preview-copy>p,.landing-final>p{font-size:17px}
+.landing-nav-actions .text-link,.landing-proof{font-size:14px}
+.landing-ctas .primary-button,.landing-secondary,.landing-nav-actions .primary-button,.landing-final .primary-button{min-height:52px;font-size:15px;padding:14px 20px}
+.landing-section{padding:clamp(64px,6vw,96px) 0}
+.learn-steps h3,.play-card strong{font-size:19px}
+.learn-steps p,.play-section>div:first-child>p,.world-chip,.play-card small,.quote-grid p{font-size:15px}
+.world-chip{padding:16px 18px}
+.play-card{padding:20px;min-height:190px}
+.sample-progress{padding:30px}
+.sample-stats strong{font-size:25px}
+.quote-grid blockquote{padding:27px}
+
+/* Lessons and exercises */
+.lesson-heading h1{font-size:clamp(38px,3.4vw,52px)}
+.lesson-topline,.lesson-tags{font-size:14px}
+.lesson-layout{gap:clamp(28px,4vw,60px)}
+.lesson-section{padding:26px 0}
+.lesson-section-title h2,.lesson-aside-title h3{font-size:22px}
+.lesson-section>p,.lesson-section .lesson-code+p,.lesson-steps li,.quiz-feedback,.experiment-control,.assignment-box>p{font-size:16px;line-height:1.75}
+.lesson-step{width:44px;height:44px;font-size:14px}
+.lesson-steps{gap:12px}
+.lesson-steps li{padding:13px 15px;gap:13px}
+.lesson-steps li span,.dry-run-table>div>span{width:30px;height:30px;font-size:13px}
+.lesson-code{font-size:15px;padding:20px;line-height:1.8;overflow-x:auto}
+.dry-run-table>div{font-size:14px;padding:10px}
+.experiment-control input,.leaderboard-profile-form input:not([type=checkbox]),.leaderboard-report-form input,.leaderboard-report-form select{min-height:48px;font-size:14px;padding:10px 12px}
+.quiz-option{min-height:56px;padding:13px 15px;font-size:15px;gap:12px}
+.quiz-box .primary-button,.lesson-footer .primary-button,.lesson-footer .subtle-button{min-height:48px;font-size:14px;padding:12px 16px}
+.lesson-aside{font-size:14px}
+.checkpoint{min-height:44px;font-size:14px}
+
+/* Games and coding arena */
+.gamehub>h1,.arena-heading h1{font-size:clamp(38px,3.5vw,54px)}
+.gamehub-grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.game-tile{min-height:220px;padding:22px}
+.game-tile h2{font-size:19px}
+.game-tile p,.game-play-panel>p,.game-controls label,.game-controls select,.game-controls input{font-size:15px;line-height:1.65}
+.game-tile-topic,.game-tile-link{font-size:13px}
+.game-play-panel{padding:26px}
+.game-play-panel>h2{font-size:24px}
+.game-controls select,.game-controls input{min-height:48px;padding:10px 12px}
+.game-array{min-height:190px}
+.game-array-cell{font-size:15px}
+.game-stats,.game-feedback,.game-hint{font-size:14px}
+.search-cell{width:58px;height:66px}
+.search-cell strong{font-size:18px}
+.search-cell small,.search-cell em,.search-cell i{font-size:12px}
+.arena-heading{margin-bottom:24px}
+.arena-heading h1{letter-spacing:-1.6px}
+.arena-shell{grid-template-columns:250px minmax(0,1fr);gap:18px}
+.problem-list{padding:16px 12px}
+.problem-choice{padding:13px 11px;gap:7px}
+.problem-choice strong{font-size:14px}
+.problem-choice small,.problem-tags,.runtime-badge,.language-badge{font-size:12px}
+.problem-bar h2{font-size:18px}
+.problem-description>p,.hint-pane>p{font-size:15px;line-height:1.75}
+.problem-example strong,.problem-example code,.hint-card{font-size:13px}
+.tab-row button{min-height:44px;font-size:13px}
+.editor-toolbar .secondary-button,.editor-actions .primary-button{min-height:42px;font-size:13px}
+.editor-actions>span,.result-empty,.test-result>span,.run-success,.run-error{font-size:12px}
+
+/* Account, search, leaderboard, and shared controls */
+.auth-card{width:min(520px,calc(100vw - 32px));padding:32px}
+.auth-brand{font-size:20px}
+.auth-card h2{font-size:30px}
+.auth-card>p,.auth-card label,.auth-switch{font-size:14px;line-height:1.6}
+.auth-card label>input,.password-input{min-height:50px;font-size:15px;padding:12px 14px}
+.auth-submit{min-height:50px;font-size:15px}
+.auth-error{font-size:13px}
+.search-dialog{width:min(720px,100%)}
+.search-input-row{height:68px}
+.search-input-row input{font-size:16px}
+.search-results>p,.search-result strong{font-size:14px}
+.search-result{min-height:56px;padding:14px}
+.search-result small,.search-hint{font-size:12px}
+.leaderboard-profile-form .leaderboard-field,.leaderboard-profile-form .leaderboard-visibility{font-size:14px}
+.leaderboard-profile-form .welcome-sub{font-size:13px}
+.leaderboard-report-form label{font-size:13px}
+.leaderboard-report-form button{min-height:42px;font-size:13px}
+.chart-empty{font-size:12px}
+
+@media(max-width:1050px){
+  .landing-hero{grid-template-columns:1fr;padding-top:54px}
+  .landing-copy h1{font-size:clamp(52px,8vw,78px)}
+  .arena-shell{grid-template-columns:190px minmax(0,1fr)}
+}
+@media(max-width:780px){
+  .content-wrap{padding-left:22px;padding-right:22px}
+  .landing-page{padding-left:26px;padding-right:26px}
+  .landing-hero{padding-top:48px}
+  .landing-copy h1{font-size:clamp(48px,8.5vw,70px)}
+  .roadmap-page,.lesson-page,.gamehub,.arena-page{max-width:none}
+  .arena-shell{grid-template-columns:1fr}
+  .gamehub-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:620px){
+  .content-wrap{padding-left:18px;padding-right:18px}
+  .landing-page{padding-left:18px;padding-right:18px}
+  .landing-copy h1{font-size:clamp(43px,11vw,58px)}
+  .landing-copy>p,.landing-section-heading>p,.play-section>div:first-child>p,.preview-copy>p,.landing-final>p{font-size:15px}
+  .landing-hero{padding-top:40px}
+  .landing-section{padding:55px 0}
+  .gamehub-grid{grid-template-columns:1fr}
+  .game-play-panel{padding:18px}
+  .lesson-heading h1{font-size:34px}
+  .lesson-section>p,.lesson-section .lesson-code+p,.lesson-steps li,.quiz-feedback,.experiment-control,.assignment-box>p{font-size:15px}
+  .auth-card{padding:24px}
+  .arena-heading h1{font-size:36px}
+}
