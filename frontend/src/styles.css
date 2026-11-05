@@ -409,3 +409,117 @@ button,select,input{min-height:44px}
   .auth-register .auth-error,.auth-register .auth-submit{grid-column:auto}
   .auth-backdrop{padding:10px 12px}
 }
+
+/* Readable sizing for lesson details, game choices, data, and arena controls. */
+.panel-kicker,.module-overline,.node-title,.node-status,.stat-label,.game-bottom,.live-badge,.page-footer,.badge-bottom,.chart-foot,.lesson-progress-label,.lesson-meta,.quest-foot,.sidebar-version,.completion-label,.problem-difficulty,.runtime-badge,.language-badge,.problem-tags,.editor-actions>span,.result-heading,.search-hint{font-size:12px}
+.module-overline{font-size:11px}
+.node-title{font-size:13px;white-space:normal;line-height:1.35}
+.node-status{font-size:11px}
+.path-node{gap:9px}
+.panel-kicker{line-height:1.45}
+.lesson-topline,.lesson-tags{font-size:14px}
+.lesson-progress-label{font-size:12px}
+.lesson-meta{font-size:13px}
+.lesson-section-title .panel-kicker{font-size:12px}
+.dry-run-table>div{min-height:54px;padding:11px 14px;gap:13px}
+.dry-run-table>div>span{width:34px;height:34px;flex-basis:34px;font-size:14px}
+.dry-run-table code{font-family:'DM Mono',monospace;font-size:14px;line-height:1.6;color:#c6d1e2}
+.experiment-control{gap:12px;margin-top:16px}
+.experiment-control label,.experiment-control span{font-size:14px}
+.experiment-control input{width:92px;min-height:48px;font-size:15px;padding:10px 12px}
+.experiment-result{gap:14px;padding:13px 15px}
+.experiment-result code{font-family:'DM Mono',monospace;font-size:13px;line-height:1.55}
+.experiment-result span{font-size:13px}
+.experiment-result strong{font-family:'DM Mono',monospace;font-size:16px}
+.lesson-code{font-size:15px}
+.lesson-steps li span,.dry-run-table>div>span{font-size:13px}
+.game-actions{gap:10px;align-items:center;flex-wrap:wrap}
+.game-actions .secondary-button,.game-controls .secondary-button,.game-actions .primary-button,.game-controls .primary-button,.step-button,.shuffle-button,.select-wrap select{height:auto;min-height:48px;font-size:14px;padding:11px 15px}
+.game-actions .secondary-button{white-space:normal;text-align:center}
+.game-controls{gap:12px}
+.game-controls label,.game-controls select,.game-controls input{font-size:14px}
+.game-stats>span{font-size:13px}
+.game-stats>span strong{font-size:14px}
+.game-feedback,.game-hint{font-size:14px;line-height:1.65;padding:12px 14px}
+.game-array-cell{font-size:15px}
+.search-cell small,.search-cell em,.search-cell i{font-size:12px}
+.stack-limit,.stack-block small,.queue-end,.graph-node small,.graph-node span,.dp-table small,.graph-edit>span,.maze-heading p{font-size:12px}
+.stack-block,.queue-person,.tree-node{font-size:14px}
+.stack-block small{font-size:11px}
+.graph-node{width:68px;height:68px}
+.graph-node strong{font-size:16px}
+.graph-node small{font-size:11px}
+.graph-node span{font-size:11px;line-height:1.25;text-align:center}
+.dp-equation{font-size:15px;line-height:1.6}
+.dp-table>div{min-width:54px;height:64px}
+.dp-table small{font-size:12px}
+.dp-table strong{font-size:15px}
+.maze-grid{width:min(100%,360px)}
+.maze-cell{font-size:16px}
+.target-banner{font-size:14px;padding:14px}
+.game-bottom{font-size:12px;line-height:1.5}
+.game-bottom strong,.chart-foot strong{font-size:13px}
+.chart-foot,.chart-foot small{font-size:12px}
+.page-footer{font-size:12px;gap:14px}
+.badge-bottom{font-size:12px}
+.coming-soon p{font-size:15px;line-height:1.7}
+.problem-choice strong{font-size:15px}
+.problem-choice small,.problem-tags,.problem-difficulty,.runtime-badge,.language-badge{font-size:12px}
+.problem-description>p,.hint-pane>p{font-size:15px;line-height:1.75}
+.problem-example strong{font-size:14px}
+.problem-example code{font-family:'DM Mono',monospace;font-size:13px;line-height:1.6}
+.tab-row button,.editor-toolbar .secondary-button,.editor-actions .primary-button{min-height:44px;font-size:13px;padding:10px 12px}
+.editor-actions>span,.result-empty,.test-result>span,.test-result small,.run-success,.run-error{font-size:13px;line-height:1.55}
+.result-heading{font-size:12px}
+.editor-pane .monaco-editor{font-size:15px}
+.page-footer span:last-child{max-width:none}
+.select-wrap>svg{top:50%;transform:translateY(-50%)}
+.profile-name,.profile-rank,.level-name,.level-name span,.xp-pill span{font-size:13px}
+.search-button kbd{font-size:12px}
+.chart-day{font-size:12px;gap:8px}
+.bar{font-size:12px}
+.module-number{width:42px;height:42px;font-size:14px}
+.module-lessons{font-size:13px}
+.bookmark-button{min-height:44px;font-size:13px;padding:9px 12px}
+.lesson-aside-title h3{font-size:19px}
+.checkpoint{min-height:46px;font-size:13px}
+.checkpoint>span{width:28px;height:28px;font-size:13px}
+.aside-reward strong{font-size:14px}
+.aside-reward small{font-size:12px}
+.game-tile-topic,.game-tile-link{font-size:13px}
+.empty-state,.list-head,.graph-edit>span{font-size:13px}
+.linked-node{font-size:14px}
+.linked-node span,.null-node{font-size:12px}
+.ring-slot small,.ring-slot em,.ring-slot i{font-size:12px}
+.ring-slot strong{font-size:14px}
+.result-heading span{font-size:12px}
+.hint-card{font-size:14px;line-height:1.65;padding:13px}
+.complexity-note{font-size:14px}
+.editor-toolbar>div{font-size:13px}
+.editor-toolbar .secondary-button{min-height:44px;font-size:13px}
+.result-empty,.test-result>span,.test-result small,.run-success,.run-error,.stdout-output{font-size:13px;line-height:1.6}
+.stdout-output{font-family:'DM Mono',monospace;overflow:auto}
+.target-banner{font-size:14px;line-height:1.55}
+.badge-check{width:22px;height:22px;font-size:13px}
+.node-circle{width:36px;height:36px;font-size:13px}
+.mission-reward{font-size:13px}
+.toast{font-size:14px;padding:13px 16px}
+.sidebar-version{font-size:11px}
+.quest-card-action .quest-foot{font-size:11px}
+.landing-proof,.landing-footer{font-size:12px}
+.demo-answer small,.demo-top,.demo-live{font-size:12px}
+.world-chip>span,.sample-tag,.sample-stats small,.sample-progress-caption,.play-card>span{font-size:12px}
+.quote-grid cite{font-size:13px}
+.leaderboard-profile-form .leaderboard-field,.leaderboard-profile-form .leaderboard-visibility,.leaderboard-report-form label{font-size:14px}
+.leaderboard-profile-form .welcome-sub{font-size:13px}
+.leaderboard-report-form button{min-height:44px;font-size:13px}
+.leaderboard-report-form input,.leaderboard-report-form select{min-height:46px;font-size:14px}
+@media(max-width:620px){
+  .game-actions>*{width:100%;justify-content:center}
+  .dry-run-table code{font-size:12px}
+  .experiment-result{align-items:flex-start;flex-direction:column}
+  .experiment-result code{font-size:12px}
+  .game-bottom{align-items:flex-start;gap:10px}
+  .dp-table{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+  .dp-table>div{min-width:0}
+}
