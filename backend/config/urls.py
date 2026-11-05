@@ -21,5 +21,6 @@ urlpatterns = [
     path("api/profile/", account_views.update_profile),
     path("api/modules/", curriculum_views.ModuleList.as_view()), path("api/lessons/<slug:slug>/", curriculum_views.LessonDetail.as_view()),
     path("api/leaderboard/", gamification_views.leaderboard),
+    path("api/points/code-task/", gamification_views.award_code_task),
     path("api/progress/lessons/<int:pk>/", curriculum_views.lesson_progress),
 ]

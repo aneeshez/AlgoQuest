@@ -10,6 +10,11 @@ export const api = {
   csrf: () => request('/api/auth/csrf/'),
   modules: () => request('/api/modules/'),
   leaderboard: () => request('/api/leaderboard/'),
+  async awardCodeTask(task) {
+    await request('/api/auth/csrf/')
+    const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')
+    return request('/api/points/code-task/', { method: 'POST', headers: { 'X-CSRFToken': decodeURIComponent(csrf || '') }, body: JSON.stringify({ task }) })
+  },
   async updateProfile(payload) {
     await request('/api/auth/csrf/')
     const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')

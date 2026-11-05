@@ -1,13 +1,19 @@
 from datetime import datetime, time, timedelta
 
+from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
+from rest_framework import permissions
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .models import UserBadge, XPTransaction
 from apps.accounts.models import UserProfile
+
+CODE_TASK_SLUGS = {"two-sum", "largest", "reverse", "binary-search"}
+CODE_TASK_REWARD = 10
+CODE_TASK_DAILY_LIMIT = 40
 
 
 @api_view(["GET"])
@@ -32,3 +38,29 @@ def leaderboard(request):
         for rank, row in enumerate(score_rows, start=1)
     ]
     return Response({"weekStart": week_start.isoformat(), "timezone": timezone.get_current_timezone_name(), "entries": entries})
+
+
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def award_code_task(request):
+    slug = request.data.get("task")
+    if not isinstance(slug, str) or slug not in CODE_TASK_SLUGS:
+        return Response({"detail": "Choose a supported coding task."}, status=400)
+    today = timezone.localdate()
+    activity_ref = f"code-task:{slug}:{today.isoformat()}"
+    with transaction.atomic():
+        profile = UserProfile.objects.select_for_update().get(user=request.user)
+        existing = XPTransaction.objects.filter(user=request.user, activity_ref=activity_ref).first()
+        if existing:
+            return Response({"awarded": False, "amount": existing.amount, "detail": "Today's reward for this task was already collected."})
+        earned_today = XPTransaction.objects.filter(user=request.user, reason="visible_code_task_completed", created_at__date=today).aggregate(total=Sum("amount"))["total"] or 0
+        if earned_today + CODE_TASK_REWARD > CODE_TASK_DAILY_LIMIT:
+            return Response({"detail": "You have reached today's coding-practice point limit."}, status=429)
+        XPTransaction.objects.create(user=request.user, activity_ref=activity_ref, amount=CODE_TASK_REWARD, reason="visible_code_task_completed")
+        profile.total_xp += CODE_TASK_REWARD
+        if profile.last_activity_date != today:
+            profile.streak_days = profile.streak_days + 1 if profile.last_activity_date == today - timedelta(days=1) else 1
+            profile.longest_streak = max(profile.longest_streak, profile.streak_days)
+            profile.last_activity_date = today
+        profile.save(update_fields=["total_xp", "streak_days", "longest_streak", "last_activity_date"])
+    return Response({"awarded": True, "amount": CODE_TASK_REWARD, "dailyLimit": CODE_TASK_DAILY_LIMIT})

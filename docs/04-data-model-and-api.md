@@ -55,6 +55,7 @@ Weekly score is the sum of eligible PointEvent values in the active weekly windo
 | GET /api/lessons/{slug}/ | Fetch a published lesson. Any section can be opened without completing another section first. |
 | POST /api/progress/lessons/{id}/ | Complete, bookmark, unbookmark, or check a lesson. |
 | GET /api/leaderboard/ | Public current-week scores using nickname and earned badge names; excludes email and login username. The current implementation returns the first 100 scores. |
+| POST /api/points/code-task/ | Award 10 XP for one of four visible coding tasks, at most once per task per day and 40 XP per day; authenticated, CSRF protected. The API cannot verify browser results, so this is casual scoring. |
 
 This is a source snapshot, not a guarantee that deployed routes have been verified.
 
@@ -78,7 +79,7 @@ Do not create a code-execution endpoint in the MVP. The browser runner must not 
 
 - All progress and point changes require an authenticated session and CSRF validation.
 - Server computes reward eligibility and points; client-supplied point amounts are ignored.
-- The client may submit a completion event for a browser-checked code task, but the server cannot prove that the code passed. Apply the documented casual-score policy and caps.
+- The client may submit a completion event for a browser-checked code task, but the server cannot prove that the code passed. Current policy awards 10 XP per supported task once per day, with a 40 XP daily cap; there are no prizes.
 - Never include answer keys in lesson payloads. Validate check attempts server-side and rate-limit repeated guessing.
 - Keep nickname normalization, uniqueness, length, allowed characters, and moderation policy consistent between serializer and database.
 - Test responses for anonymous users, own account, another learner's data, and admin-only actions.
