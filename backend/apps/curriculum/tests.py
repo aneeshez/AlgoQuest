@@ -78,15 +78,15 @@ class StarterCurriculumContentTests(TestCase):
     def setUpTestData(cls):
         call_command("seed_curriculum", verbosity=0)
 
-    def test_four_lessons_per_section_have_authored_executable_examples(self):
+    def test_authored_lessons_have_executable_examples_and_valid_checks(self):
         authored = {
-            "basics": ["Variables and values", "Loops and repetition", "Big O notation", "Conditions and decisions"],
+            "basics": ["Variables and values", "Conditions and decisions", "Loops and repetition", "Functions and decomposition", "Trace a small program", "Count the work", "Big O notation", "Time and space tradeoffs", "Best, average, and worst cases", "Array operations", "Linear and binary search", "Sorting fundamentals", "Two pointers", "Sliding window"],
             "medium": ["Dictionaries as lookup tables", "Set membership", "Frequency counting", "Hash maps and collisions"],
             "advanced": ["Binary tree anatomy", "Depth-first traversal", "Graph representations", "Breadth-first search"],
         }
         for section, titles in authored.items():
             lessons = list(Lesson.objects.filter(module__section=section, title__in=titles))
-            self.assertEqual(len(lessons), 4, msg=f"Expected four authored lessons in {section}.")
+            self.assertEqual(len(lessons), len(titles), msg=f"Expected every listed lesson to be authored in {section}.")
             for lesson in lessons:
                 self.assertNotIn("is a core idea", lesson.concept)
                 self.assertTrue(lesson.analogy)
