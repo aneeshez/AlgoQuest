@@ -18,7 +18,7 @@ This log captures user-confirmed decisions and proposed defaults. A proposed def
 | D-10 | Sign-in uses username and password; collect email for the account record. | 2026-11-05 |
 | D-11 | No custom domain is available. Automated recovery email is deferred; use admin-assisted reset for the small private beta. | 2026-11-05 |
 | D-12 | Python exercises run in the learner's browser. | 2026-11-05 |
-| D-13 | Vercel Hobby is the leading hosting candidate for personal, non-commercial use. | 2026-11-05 |
+| D-13 | Use Vercel Hobby with Vercel Services for the personal, non-commercial friends beta. Production is deployed at `algoquest-beta.vercel.app`. | 2026-11-05 |
 | D-14 | Learners see one another's points and badges on a global leaderboard. | 2026-11-05 |
 | D-15 | Leaderboard display uses a nickname, not login username or email. | 2026-11-05 |
 | D-16 | Leaderboard ranks weekly points. | 2026-11-05 |

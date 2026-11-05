@@ -6,6 +6,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "local-only-change-me-before-deploying")
 DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() == "true"
 ALLOWED_HOSTS = [host.strip() for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if host.strip()]
+vercel_runtime_host = os.getenv("VERCEL_URL", "").strip()
+if vercel_runtime_host and vercel_runtime_host not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(vercel_runtime_host)
 
 if not DEBUG:
     if SECRET_KEY == "local-only-change-me-before-deploying" or len(SECRET_KEY) < 50:
