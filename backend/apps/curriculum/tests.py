@@ -1,3 +1,5 @@
+import io
+from contextlib import redirect_stdout
 from datetime import timedelta
 from django.contrib.auth.models import User
 from django.core.management import call_command
@@ -81,7 +83,7 @@ class StarterCurriculumContentTests(TestCase):
     def test_authored_lessons_have_executable_examples_and_valid_checks(self):
         authored = {
             "basics": ["Variables and values", "Conditions and decisions", "Loops and repetition", "Functions and decomposition", "Trace a small program", "Count the work", "Big O notation", "Time and space tradeoffs", "Best, average, and worst cases", "Array operations", "Linear and binary search", "Sorting fundamentals", "Two pointers", "Sliding window"],
-            "medium": ["Dictionaries as lookup tables", "Set membership", "Frequency counting", "Hash maps and collisions"],
+            "medium": ["Dictionaries as lookup tables", "Set membership", "Frequency counting", "Hash maps and collisions", "Recursive thinking", "Base cases and call stack", "Backtracking choices", "Generate combinations", "Singly linked nodes", "Insert and delete", "Reverse a list", "Cycle detection", "Stack and LIFO", "Queue and FIFO", "Monotonic stacks", "Deque and circular queue"],
             "advanced": ["Binary tree anatomy", "Depth-first traversal", "Graph representations", "Breadth-first search"],
         }
         for section, titles in authored.items():
@@ -95,4 +97,6 @@ class StarterCurriculumContentTests(TestCase):
                 self.assertTrue(lesson.assignment_prompt)
                 self.assertEqual(len(lesson.check_options), 4)
                 self.assertLess(lesson.check_answer, len(lesson.check_options))
-                compile(lesson.python_code, f"{lesson.slug}.py", "exec")
+                code = compile(lesson.python_code, f"{lesson.slug}.py", "exec")
+                with redirect_stdout(io.StringIO()):
+                    exec(code, {})
