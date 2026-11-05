@@ -28,6 +28,7 @@ Use a same-origin deployment or same-origin API proxy where possible. This simpl
 - Backend: Django/DRF in backend; current Django apps cover accounts, curriculum, progress, and gamification.
 - Local development: frontend Vite dev server; backend Django development server; SQLite default.
 - PostgreSQL: configured through DATABASE_URL and psycopg.
+- Vercel: an initial Services routing file sends `/api/*` to Django and other paths to the Vite frontend. Its JSON syntax is validated, but local Vercel CLI and hosted preview checks have not passed yet.
 - Current endpoints include health, CSRF, me, register/login/logout, modules, lesson detail, and lesson progress.
 
 The repository README reports that the current deployment is not production configured. The target architecture below includes requirements that are still missing and should not be read as implemented.

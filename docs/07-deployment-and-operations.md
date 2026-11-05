@@ -38,6 +38,7 @@ These are a dated snapshot, not a promise. Vercel, Render, and Supabase may chan
 ### Before first deploy
 
 - Confirm Vercel Hobby personal/non-commercial eligibility for the intended use and whether Vercel Services beta access is available for this account. If not, test the same-origin Render shape against its cold-start trade-off.
+- Validate the checked-in `vercel.json` using the current CLI and a preview deployment. Do not invite learners until the preview proves login, logout, CSRF, curriculum, progress, and leaderboard behavior.
 - Create separate development and launch Supabase projects if within the two-project free limit; do not use production data in previews.
 - Configure Django environment values: strong DJANGO_SECRET_KEY, DEBUG false, exact ALLOWED_HOSTS, DATABASE_URL, exact CSRF_TRUSTED_ORIGINS, and exact CORS_ALLOWED_ORIGINS if separate origins are required.
 - Configure secure cookies, HTTPS/proxy behavior, static assets, host redirects, and error pages.
