@@ -92,7 +92,7 @@ function App() {
 
   return <div className="min-h-screen bg-[#090d18] text-slate-100">
     <div className="ambient ambient-one" /><div className="ambient ambient-two" />
-    <div className={`relative mx-auto flex min-h-screen max-w-[1600px] ${active === 'Landing' ? 'landing-shell' : ''}`}>
+    <div className={`relative mx-auto flex min-h-screen ${active === 'Landing' ? 'landing-shell' : ''}`}>
       <aside className={`sidebar ${collapsed ? 'sidebar-small' : ''} ${active === 'Landing' ? 'landing-hidden' : ''}`}>
         <div className="brand-row"><div className="brand-mark"><Sparkles size={18} fill="currentColor" /></div>{!collapsed && <div className="brand-name">algo<span>quest</span></div>}<button className="icon-button collapse-button" aria-label="Collapse sidebar" onClick={() => setCollapsed(!collapsed)}><ChevronLeft size={16} /></button></div>
         <div className="profile-card"><div className="avatar">{account?.user?.username?.[0]?.toUpperCase() || 'G'}</div>{!collapsed && <div className="min-w-0"><div className="profile-name">{account?.user?.username || 'Guest explorer'}</div><div className="profile-rank"><span className="rank-dot" /> {account?.authenticated ? `${account.profile.totalXp} XP earned` : 'Guest mode'}</div></div>}{!collapsed && <ChevronDown size={15} className="ml-auto text-slate-500" />}</div>
