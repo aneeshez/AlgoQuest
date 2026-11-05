@@ -25,7 +25,7 @@ Keep one new idea per lesson. Use worked examples before asking learners to solv
 
 ### Starter content coverage
 
-The seed data now provides 34 authored lessons: all 14 Basics lessons; all 16 Medium lessons on hashing, recursion, backtracking, linked lists, stacks, queues, and monotonic stacks; and four Advanced lessons on tree structure, DFS, graph representation, and BFS. The other eight Advanced seed entries are drafts and must not be represented as fully edited lessons. Automated checks execute every authored Python example and confirm that each check has four options with a valid answer index; editorial review against the full lesson pattern above remains outstanding.
+All 42 seeded lessons now have authored teaching content: 14 Basics, 16 Medium, and 12 Advanced across trees, graphs, greedy algorithms, and dynamic programming. Automated checks execute every lesson's Python example and confirm that each check has four options with a valid answer index. Editorial review against the full lesson pattern above—including sample output review, progressive hints, richer dry runs, and assessment calibration—remains outstanding before a public launch.
 
 The top-level navigation contains Basics, Medium, and Advanced. Sections are all open from the start; learners can follow the recommended route or choose a topic. Show prerequisite suggestions without locking content. Add a short placement/self-check to recommend a starting point, not to block access.
 

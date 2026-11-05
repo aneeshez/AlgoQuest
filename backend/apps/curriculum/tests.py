@@ -84,7 +84,7 @@ class StarterCurriculumContentTests(TestCase):
         authored = {
             "basics": ["Variables and values", "Conditions and decisions", "Loops and repetition", "Functions and decomposition", "Trace a small program", "Count the work", "Big O notation", "Time and space tradeoffs", "Best, average, and worst cases", "Array operations", "Linear and binary search", "Sorting fundamentals", "Two pointers", "Sliding window"],
             "medium": ["Dictionaries as lookup tables", "Set membership", "Frequency counting", "Hash maps and collisions", "Recursive thinking", "Base cases and call stack", "Backtracking choices", "Generate combinations", "Singly linked nodes", "Insert and delete", "Reverse a list", "Cycle detection", "Stack and LIFO", "Queue and FIFO", "Monotonic stacks", "Deque and circular queue"],
-            "advanced": ["Binary tree anatomy", "Depth-first traversal", "Graph representations", "Breadth-first search"],
+            "advanced": ["Binary tree anatomy", "Depth-first traversal", "Binary search trees", "Heaps and priority queues", "Graph representations", "Breadth-first search", "Graph depth-first search", "Shortest paths and cycles", "Greedy choices", "Overlapping subproblems", "Memoization", "Tabulation"],
         }
         for section, titles in authored.items():
             lessons = list(Lesson.objects.filter(module__section=section, title__in=titles))
