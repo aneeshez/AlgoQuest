@@ -43,3 +43,25 @@ class QuestProgress(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["user", "quest_slug"], name="unique_user_quest_progress")]
+
+
+class NicknameReport(models.Model):
+    class Status(models.TextChoices):
+        OPEN = "open", "Open"
+        REVIEWED = "reviewed", "Reviewed"
+
+    class Category(models.TextChoices):
+        INAPPROPRIATE = "inappropriate", "Inappropriate nickname"
+        IMPERSONATION = "impersonation", "Impersonation"
+        OTHER = "other", "Other concern"
+
+    reporter = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="nickname_reports_made")
+    target = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="nickname_reports_received")
+    category = models.CharField(max_length=24, choices=Category.choices)
+    details = models.CharField(max_length=300, blank=True)
+    status = models.CharField(max_length=12, choices=Status.choices, default=Status.OPEN)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["reporter", "target"], name="unique_nickname_reporter_target")]
+        ordering = ["status", "created_at"]

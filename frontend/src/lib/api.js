@@ -10,6 +10,11 @@ export const api = {
   csrf: () => request('/api/auth/csrf/'),
   modules: () => request('/api/modules/'),
   leaderboard: () => request('/api/leaderboard/'),
+  async reportNickname(reportToken, category, details) {
+    await request('/api/auth/csrf/')
+    const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')
+    return request('/api/leaderboard/report/', { method: 'POST', headers: { 'X-CSRFToken': decodeURIComponent(csrf || '') }, body: JSON.stringify({ reportToken, category, details }) })
+  },
   async awardCodeTask(task) {
     await request('/api/auth/csrf/')
     const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')

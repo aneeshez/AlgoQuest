@@ -6,7 +6,7 @@ Milestones are ordered around reviewable outcomes. Some foundation work already 
 
 **Outcome:** remaining launch assumptions are decided and the chosen free hosting path is technically feasible.
 
-- Confirm registration policy, nickname visibility/opt-out, weekly reset timezone, support channel, and minimum content count.
+- Confirm registration policy, weekly reset timezone, support channel, and minimum editorially reviewed content count. Nickname visibility now defaults on with a learner hide control.
 - Deploy a minimal Vercel Django + React slice and connect to a disposable Supabase database.
 - Verify session cookies, CSRF, migration strategy, static files, and database pool behavior.
 
@@ -49,10 +49,10 @@ Milestones are ordered around reviewable outcomes. Some foundation work already 
 **Outcome:** learners see progress and can participate in the casual global weekly leaderboard.
 
 - Implement immutable point events, idempotent rewards, lifetime level calculation, and badges.
-- Add nickname, public leaderboard, weekly aggregation, stable ties, reporting/moderation, and point caps.
+- Add nickname, public leaderboard, weekly aggregation, stable ties, limited nickname reporting, learner hide control, admin report review, and point caps.
 - Explain that code-derived points are not cheat-proof and have no prizes.
 
-**Accept when:** weekly boundary tests pass; duplicate requests do not duplicate scores; public responses omit email; a learner cannot view or edit another learner's private progress; nickname report/hide works.
+**Accept when:** weekly boundary tests pass; duplicate requests do not duplicate scores; public responses omit email and login username; a learner cannot view or edit another learner's private progress; nickname report/hide works; moderation controls are tested on the hosted database.
 
 ## M5. Administration, privacy, and support
 

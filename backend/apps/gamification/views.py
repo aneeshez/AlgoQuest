@@ -1,4 +1,5 @@
 from datetime import datetime, time, timedelta
+import uuid
 
 from django.db import transaction
 from django.db.models import Sum
@@ -8,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from .models import QuestProgress, UserBadge, XPTransaction
+from .models import NicknameReport, QuestProgress, UserBadge, XPTransaction
 from apps.accounts.models import UserProfile
 from .services import advance_activity_streak
 
@@ -25,20 +26,47 @@ def leaderboard(request):
     start = timezone.make_aware(datetime.combine(week_start, time.min))
     end = timezone.make_aware(datetime.combine(week_start + timedelta(days=7), time.min))
     score_rows = list(
-        UserProfile.objects.filter(user__xp_transactions__created_at__gte=start, user__xp_transactions__created_at__lt=end)
+        UserProfile.objects.filter(leaderboard_visible=True, user__xp_transactions__created_at__gte=start, user__xp_transactions__created_at__lt=end)
         .annotate(weekly_xp=Sum("user__xp_transactions__amount"))
         .order_by("-weekly_xp", "user_id")[:100]
-        .values("user_id", "nickname", "weekly_xp")
+        .values("user_id", "nickname", "weekly_xp", "leaderboard_report_token")
     )
     user_ids = [row["user_id"] for row in score_rows]
     badges_by_user = {user_id: [] for user_id in user_ids}
     for row in UserBadge.objects.filter(user_id__in=user_ids).select_related("badge").order_by("badge__lesson_threshold", "badge__slug"):
         badges_by_user[row.user_id].append({"slug": row.badge.slug, "name": row.badge.name})
     entries = [
-        {"rank": rank, "nickname": row["nickname"], "weeklyXp": row["weekly_xp"], "badges": badges_by_user[row["user_id"]]}
+        {"rank": rank, "nickname": row["nickname"], "weeklyXp": row["weekly_xp"], "badges": badges_by_user[row["user_id"]], "reportToken": str(row["leaderboard_report_token"]), "isSelf": request.user.is_authenticated and request.user.id == row["user_id"]}
         for rank, row in enumerate(score_rows, start=1)
     ]
     return Response({"weekStart": week_start.isoformat(), "timezone": timezone.get_current_timezone_name(), "entries": entries})
+
+
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def report_nickname(request):
+    token = request.data.get("reportToken")
+    category = request.data.get("category")
+    details = request.data.get("details", "")
+    if not isinstance(token, str) or category not in NicknameReport.Category.values or not isinstance(details, str) or len(details) > 300:
+        return Response({"detail": "Choose a report reason and include no more than 300 characters of detail."}, status=400)
+    try:
+        token = uuid.UUID(token)
+    except ValueError:
+        return Response({"detail": "Reload the leaderboard and choose a valid entry."}, status=400)
+    target = UserProfile.objects.filter(leaderboard_report_token=token, leaderboard_visible=True).first()
+    if target is None:
+        return Response({"detail": "That leaderboard entry is no longer available."}, status=404)
+    target_id = target.user_id
+    if target_id == request.user.id:
+        return Response({"detail": "You cannot report your own nickname."}, status=400)
+    recent_reports = NicknameReport.objects.filter(reporter=request.user, created_at__gte=timezone.now() - timedelta(days=1)).count()
+    if recent_reports >= 5:
+        return Response({"detail": "You have reached the daily report limit."}, status=429)
+    report, created = NicknameReport.objects.get_or_create(reporter=request.user, target_id=target_id, defaults={"category": category, "details": details.strip()})
+    if not created:
+        return Response({"detail": "You have already reported this nickname."}, status=409)
+    return Response({"submitted": True}, status=201)
 
 
 @api_view(["POST"])

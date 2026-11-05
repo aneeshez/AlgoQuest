@@ -33,7 +33,7 @@ def _account_response(user):
     start = today - timedelta(days=6)
     daily = {row["day"].isoformat(): row["total"] for row in user.xp_transactions.filter(created_at__date__gte=start).annotate(day=TruncDate("created_at")).values("day").annotate(total=Sum("amount"))}
     weekly_activity = [{"date": (start + timedelta(days=index)).isoformat(), "label": (start + timedelta(days=index)).strftime("%a"), "xp": daily.get((start + timedelta(days=index)).isoformat(), 0)} for index in range(7)]
-    return JsonResponse({"authenticated": True, "user": {"id": user.id, "username": user.username, "email": user.email, "isStaff": user.is_staff}, "profile": {"nickname": profile.nickname, "totalXp": profile.total_xp, "streakDays": profile.streak_days, "longestStreak": profile.longest_streak, "weeklyActivity": weekly_activity}})
+    return JsonResponse({"authenticated": True, "user": {"id": user.id, "username": user.username, "email": user.email, "isStaff": user.is_staff}, "profile": {"nickname": profile.nickname, "leaderboardVisible": profile.leaderboard_visible, "totalXp": profile.total_xp, "streakDays": profile.streak_days, "longestStreak": profile.longest_streak, "weeklyActivity": weekly_activity}})
 
 def auth_rate_limit(view):
     @wraps(view)
@@ -115,13 +115,24 @@ def sign_out(request):
 @require_http_methods(["PATCH"])
 def update_profile(request):
     if not request.user.is_authenticated:
-        return JsonResponse({"detail": "Sign in to update your nickname."}, status=401)
+        return JsonResponse({"detail": "Sign in to update your profile."}, status=401)
     data = _body(request)
     if data is None:
         return JsonResponse({"detail": "Send valid JSON."}, status=400)
-    nickname = str(data.get("nickname", "")).strip()
-    if not _valid_nickname(nickname):
-        return JsonResponse({"detail": "Nickname must be 3 to 24 characters and use letters, numbers, spaces, hyphens, or underscores."}, status=400)
-    request.user.profile.nickname = nickname
-    request.user.profile.save(update_fields=["nickname"])
-    return JsonResponse({"nickname": nickname})
+    if not isinstance(data, dict) or not data or set(data) - {"nickname", "leaderboardVisible"}:
+        return JsonResponse({"detail": "Update a nickname or leaderboard visibility."}, status=400)
+    profile = request.user.profile
+    fields = []
+    if "nickname" in data:
+        nickname = data["nickname"].strip() if isinstance(data["nickname"], str) else ""
+        if not _valid_nickname(nickname):
+            return JsonResponse({"detail": "Nickname must be 3 to 24 characters and use letters, numbers, spaces, hyphens, or underscores."}, status=400)
+        profile.nickname = nickname
+        fields.append("nickname")
+    if "leaderboardVisible" in data:
+        if not isinstance(data["leaderboardVisible"], bool):
+            return JsonResponse({"detail": "Leaderboard visibility must be true or false."}, status=400)
+        profile.leaderboard_visible = data["leaderboardVisible"]
+        fields.append("leaderboard_visible")
+    profile.save(update_fields=fields)
+    return JsonResponse({"nickname": profile.nickname, "leaderboardVisible": profile.leaderboard_visible})

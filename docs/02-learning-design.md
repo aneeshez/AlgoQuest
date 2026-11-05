@@ -81,7 +81,7 @@ Games should be short, keyboard usable, pauseable, and playable without a timer.
 - The weekly competition is casual. No prizes, paid benefits, or claims that rank equals skill.
 - Browser-checked code task results can be forged. Apply daily/weekly point caps, duplicate-event protection, rate limits, and simple anomaly review. These measures reduce abuse but do not make code scores cheat-proof.
 - Proposed default: leaderboard week starts Monday 00:00 in the configured product timezone. Confirm the timezone and reset boundary before implementation.
-- Provide a report/administrative hide path for abusive nicknames. A learner-facing opt-out is recommended and remains an open product decision.
+- Learners can hide their nickname from the leaderboard. An authenticated learner can report another visible nickname; reports enter the restricted Django admin queue for review.
 
 ## 6. Editorial quality bar
 

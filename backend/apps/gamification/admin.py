@@ -1,5 +1,13 @@
 from django.contrib import admin
-from .models import Badge, QuestProgress, UserBadge, XPTransaction
+from .models import Badge, NicknameReport, QuestProgress, UserBadge, XPTransaction
+
+
+@admin.register(NicknameReport)
+class NicknameReportAdmin(admin.ModelAdmin):
+    list_display = ("target", "reporter", "category", "status", "created_at")
+    list_filter = ("status", "category", "created_at")
+    search_fields = ("target__username", "target__profile__nickname", "reporter__username", "details")
+    readonly_fields = ("reporter", "target", "category", "details", "created_at")
 
 @admin.register(XPTransaction)
 class XPTransactionAdmin(admin.ModelAdmin):

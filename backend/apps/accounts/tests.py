@@ -67,6 +67,11 @@ class SessionAuthenticationTests(TestCase):
         self.assertEqual(user.profile.__class__.objects.get(user=user).nickname, "New Quest Name")
         invalid = client.patch("/api/profile/", data=json.dumps({"nickname": "a"}), content_type="application/json", HTTP_X_CSRFTOKEN=token)
         self.assertEqual(invalid.status_code, 400)
+        hidden = client.patch("/api/profile/", data=json.dumps({"leaderboardVisible": False}), content_type="application/json", HTTP_X_CSRFTOKEN=token)
+        self.assertEqual(hidden.status_code, 200)
+        self.assertFalse(hidden.json()["leaderboardVisible"])
+        me = client.get("/api/auth/me/")
+        self.assertFalse(me.json()["profile"]["leaderboardVisible"])
 
     def test_public_leaderboard_uses_nicknames_and_current_week_points_only(self):
         first = User.objects.create_user("private-login-one", "private-one@example.com", "Trailblazer!2026")

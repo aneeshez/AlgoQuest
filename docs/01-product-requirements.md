@@ -88,7 +88,7 @@ The registration policy is not yet confirmed. The working assumption is self-reg
 1. Learner sees personal progress, earned badges, total learning points, and weekly points.
 2. Learner opens the global leaderboard and sees nicknames, badges, and current-week scores for registered learners.
 3. The app states that scores are casual and browser-checked code results can be manipulated.
-4. Learner can change nickname and request to hide their leaderboard entry; the opt-out control is a proposed privacy requirement pending confirmation.
+4. Learner can change their nickname or hide their entry; signed-in learners can report another nickname for staff review.
 
 ### D. Learner needs password help
 
@@ -116,7 +116,7 @@ This process is appropriate only for a small private beta. It is a scalability a
 | FR-11 | Allow an admin to create, edit, review, publish, and unpublish curriculum content. | Must before broad public launch |
 | FR-12 | Give beginner-friendly feedback, optional hints, and retry paths rather than only a pass/fail signal. | Must |
 | FR-13 | Provide basic nickname/content moderation and a way to report inappropriate leaderboard display names. | Must before broad public launch |
-| FR-14 | Provide a weekly leaderboard privacy control and explain what information is public. | Should; opt-out proposal |
+| FR-14 | Provide a weekly leaderboard privacy control and explain what information is public. | Must |
 
 ## 8. Non-functional requirements
 

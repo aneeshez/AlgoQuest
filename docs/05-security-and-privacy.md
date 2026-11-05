@@ -18,8 +18,9 @@ The product is an educational app with public accounts and a global leaderboard.
 
 - Use a separate nickname; do not publish username or email by default.
 - Public leaderboard fields are limited to nickname, current-week points, and selected earned badges.
-- Validate nickname length and characters; block obvious impersonation, slurs, and personal contact details. Provide report and admin-hide controls.
-- A learner opt-out from the leaderboard is recommended; whether it is required remains open.
+- Validate nickname length and characters. Nicknames can be reported by signed-in learners; reports are restricted to the admin site, where staff can change status and hide a learner by disabling leaderboard visibility.
+- Leaderboard visibility defaults on to match the selected global leaderboard, and each learner can turn it off from the leaderboard page. Hidden learners are excluded from public scores and badge lists.
+- Report requests require sign-in, use a random UUID reference instead of exposing an account ID, allow one report per target per reporter, and are limited to five reports per reporter per day. Review abuse controls before broad public signup.
 - Provide a data export/deletion request path and document what deletion removes. Preserve only data required for security or legally required operations, with a stated retention period.
 - Minimize analytics and avoid third-party trackers in the no-cost MVP unless explicitly justified and disclosed.
 
