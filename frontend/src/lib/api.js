@@ -1,0 +1,23 @@
+async function request(path, options = {}) {
+  const response = await fetch(path, { credentials: 'include', ...options, headers: { 'Content-Type': 'application/json', ...(options.headers || {}) } })
+  const data = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(data.detail || 'Something went wrong. Please try again.')
+  return data
+}
+
+export const api = {
+  me: () => request('/api/auth/me/'),
+  csrf: () => request('/api/auth/csrf/'),
+  modules: () => request('/api/modules/'),
+  lesson: (slug) => request(`/api/lessons/${slug}/`),
+  async progress(id, payload) {
+    await request('/api/auth/csrf/')
+    const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')
+    return request(`/api/progress/lessons/${id}/`, { method: 'POST', headers: { 'X-CSRFToken': decodeURIComponent(csrf || '') }, body: JSON.stringify(payload) })
+  },
+  async auth(action, payload = {}) {
+    await request('/api/auth/csrf/')
+    const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')
+    return request(`/api/auth/${action}/`, { method: 'POST', headers: { 'X-CSRFToken': decodeURIComponent(csrf || '') }, body: JSON.stringify(payload) })
+  },
+}

@@ -51,7 +51,7 @@ Weekly score is the sum of eligible PointEvent values in the active weekly windo
 | POST /api/auth/login/ | Sign in using username/password. |
 | POST /api/auth/logout/ | End session. |
 | GET /api/modules/ | List published modules and lesson summaries. |
-| GET /api/lessons/{slug}/ | Fetch a lesson. Current implementation applies sequential world gating, which must change to match the open-section decision. |
+| GET /api/lessons/{slug}/ | Fetch a published lesson. Any section can be opened without completing another section first. |
 | POST /api/progress/lessons/{id}/ | Complete, bookmark, unbookmark, or check a lesson. |
 
 This is a source snapshot, not a guarantee that deployed routes have been verified.
