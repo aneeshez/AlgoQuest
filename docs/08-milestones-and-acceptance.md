@@ -38,6 +38,7 @@ Milestones are ordered around reviewable outcomes. Some foundation work already 
 **Outcome:** games, story quests, assignments, and code practice reinforce stated concepts.
 
 - Connect current games to lessons/objectives; add scenario quests for uncovered objectives.
+- A saved three-step story quest now practices BFS, FIFO queues, and binary search, awarding 15 XP once on completion.
 - Keep Pyodide in a bounded Web Worker; display startup, success, error, timeout, and retry states.
 - Review origin isolation, secret exposure, output escaping, mobile performance, and worker lifecycle.
 

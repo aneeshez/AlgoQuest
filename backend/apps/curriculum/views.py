@@ -1,4 +1,3 @@
-from datetime import timedelta
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import generics, permissions
@@ -9,6 +8,7 @@ from .serializers import LessonSerializer, ModuleSerializer
 from apps.accounts.models import UserProfile
 from apps.gamification.models import XPTransaction
 from apps.gamification.services import award_lesson_badges
+from apps.gamification.services import advance_activity_streak
 
 class ModuleList(generics.ListAPIView):
     queryset = LearningModule.objects.filter(is_published=True).prefetch_related("lessons")
@@ -52,11 +52,7 @@ def lesson_progress(request, pk):
             XPTransaction.objects.get_or_create(user=request.user, activity_ref=f"lesson:{lesson.id}", defaults={"amount": lesson.xp_reward, "reason": "lesson_completed"})
             profile = UserProfile.objects.select_for_update().get(user=request.user)
             profile.total_xp = sum(request.user.xp_transactions.values_list("amount", flat=True))
-            today = timezone.localdate()
-            if profile.last_activity_date != today:
-                profile.streak_days = profile.streak_days + 1 if profile.last_activity_date == today - timedelta(days=1) else 1
-                profile.longest_streak = max(profile.longest_streak, profile.streak_days)
-                profile.last_activity_date = today
+            advance_activity_streak(profile)
             profile.save(update_fields=["total_xp", "streak_days", "longest_streak", "last_activity_date"])
         if action == "complete":
             award_lesson_badges(request.user)

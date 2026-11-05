@@ -8,8 +8,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from .models import UserBadge, XPTransaction
+from .models import QuestProgress, UserBadge, XPTransaction
 from apps.accounts.models import UserProfile
+from .services import advance_activity_streak
 
 CODE_TASK_SLUGS = {"two-sum", "largest", "reverse", "binary-search"}
 CODE_TASK_REWARD = 10
@@ -58,9 +59,51 @@ def award_code_task(request):
             return Response({"detail": "You have reached today's coding-practice point limit."}, status=429)
         XPTransaction.objects.create(user=request.user, activity_ref=activity_ref, amount=CODE_TASK_REWARD, reason="visible_code_task_completed")
         profile.total_xp += CODE_TASK_REWARD
-        if profile.last_activity_date != today:
-            profile.streak_days = profile.streak_days + 1 if profile.last_activity_date == today - timedelta(days=1) else 1
-            profile.longest_streak = max(profile.longest_streak, profile.streak_days)
-            profile.last_activity_date = today
+        advance_activity_streak(profile, today)
         profile.save(update_fields=["total_xp", "streak_days", "longest_streak", "last_activity_date"])
     return Response({"awarded": True, "amount": CODE_TASK_REWARD, "dailyLimit": CODE_TASK_DAILY_LIMIT})
+
+
+QUEST_SLUG = "network-rescue"
+QUEST_ANSWERS = ("bfs", "queue", "binary-search")
+QUEST_FEEDBACK = (
+    "Correct. BFS visits nearby stations first and finds the clinic using the fewest edges.",
+    "Correct. A queue serves emergency requests in the order they arrived.",
+    "Correct. Binary search halves the sorted inventory range at each check.",
+)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])
+def quest_progress(request):
+    if not request.user.is_authenticated:
+        return Response({"currentStep": 0, "completed": False})
+    progress, _ = QuestProgress.objects.get_or_create(user=request.user, quest_slug=QUEST_SLUG)
+    return Response({"currentStep": progress.current_step, "completed": bool(progress.completed_at)})
+
+
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def quest_step(request):
+    step = request.data.get("step")
+    answer = request.data.get("answer")
+    if not isinstance(step, int) or isinstance(step, bool) or not isinstance(answer, str):
+        return Response({"detail": "Send a step number and an answer."}, status=400)
+    with transaction.atomic():
+        progress, _ = QuestProgress.objects.select_for_update().get_or_create(user=request.user, quest_slug=QUEST_SLUG)
+        if progress.completed_at:
+            return Response({"correct": True, "currentStep": len(QUEST_ANSWERS), "completed": True, "alreadyComplete": True})
+        if step != progress.current_step or step >= len(QUEST_ANSWERS) or step < 0:
+            return Response({"detail": "That quest step is no longer current. Reload your quest progress."}, status=409)
+        if answer != QUEST_ANSWERS[step]:
+            return Response({"correct": False, "currentStep": progress.current_step, "completed": False})
+        progress.current_step += 1
+        if progress.current_step == len(QUEST_ANSWERS):
+            progress.completed_at = timezone.now()
+            XPTransaction.objects.get_or_create(user=request.user, activity_ref=f"quest:{QUEST_SLUG}", defaults={"amount": 15, "reason": "story_quest_completed"})
+            profile = UserProfile.objects.select_for_update().get(user=request.user)
+            profile.total_xp = sum(request.user.xp_transactions.values_list("amount", flat=True))
+            advance_activity_streak(profile)
+            profile.save(update_fields=["total_xp", "streak_days", "longest_streak", "last_activity_date"])
+        progress.save(update_fields=["current_step", "completed_at", "updated_at"])
+    return Response({"correct": True, "currentStep": progress.current_step, "completed": bool(progress.completed_at), "feedback": QUEST_FEEDBACK[step], "reward": 15 if progress.completed_at else 0})

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Badge, UserBadge, XPTransaction
+from .models import Badge, QuestProgress, UserBadge, XPTransaction
 
 @admin.register(XPTransaction)
 class XPTransactionAdmin(admin.ModelAdmin):
@@ -19,3 +19,10 @@ class UserBadgeAdmin(admin.ModelAdmin):
     list_display = ("user", "badge", "earned_at")
     list_filter = ("badge",)
     search_fields = ("user__username", "badge__name")
+
+
+@admin.register(QuestProgress)
+class QuestProgressAdmin(admin.ModelAdmin):
+    list_display = ("user", "quest_slug", "current_step", "completed_at", "updated_at")
+    list_filter = ("quest_slug", "completed_at")
+    search_fields = ("user__username", "quest_slug")

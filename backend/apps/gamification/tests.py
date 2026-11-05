@@ -43,3 +43,25 @@ class BrowserCodeTaskRewardTests(TestCase):
         token = client.cookies["csrftoken"].value
         accepted = client.post("/api/points/code-task/", {"task": "two-sum"}, format="json", HTTP_X_CSRFTOKEN=token)
         self.assertEqual(accepted.status_code, 200)
+
+    def test_story_quest_saves_each_correct_step_and_awards_once(self):
+        self.assertEqual(self.client.get("/api/quests/network-rescue/").json(), {"currentStep": 0, "completed": False})
+        wrong = self.client.post("/api/quests/network-rescue/step/", {"step": 0, "answer": "dfs"}, format="json")
+        self.assertFalse(wrong.json()["correct"])
+        skipped = self.client.post("/api/quests/network-rescue/step/", {"step": 1, "answer": "queue"}, format="json")
+        self.assertEqual(skipped.status_code, 409)
+        for step, answer in enumerate(["bfs", "queue", "binary-search"]):
+            result = self.client.post("/api/quests/network-rescue/step/", {"step": step, "answer": answer}, format="json")
+            self.assertEqual(result.status_code, 200)
+        self.assertTrue(result.json()["completed"])
+        self.assertEqual(result.json()["reward"], 15)
+        replay = self.client.post("/api/quests/network-rescue/step/", {"step": 2, "answer": "binary-search"}, format="json")
+        self.assertTrue(replay.json()["alreadyComplete"])
+        self.user.profile.refresh_from_db()
+        self.assertEqual(self.user.profile.total_xp, 15)
+        self.assertEqual(XPTransaction.objects.filter(user=self.user, reason="story_quest_completed").count(), 1)
+        self.assertEqual(self.client.get("/api/quests/network-rescue/").json(), {"currentStep": 3, "completed": True})
+
+    def test_story_quest_steps_require_login(self):
+        response = APIClient().post("/api/quests/network-rescue/step/", {"step": 0, "answer": "bfs"}, format="json")
+        self.assertEqual(response.status_code, 403)

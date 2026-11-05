@@ -15,6 +15,12 @@ export const api = {
     const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')
     return request('/api/points/code-task/', { method: 'POST', headers: { 'X-CSRFToken': decodeURIComponent(csrf || '') }, body: JSON.stringify({ task }) })
   },
+  questProgress: () => request('/api/quests/network-rescue/'),
+  async questStep(step, answer) {
+    await request('/api/auth/csrf/')
+    const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')
+    return request('/api/quests/network-rescue/step/', { method: 'POST', headers: { 'X-CSRFToken': decodeURIComponent(csrf || '') }, body: JSON.stringify({ step, answer }) })
+  },
   async updateProfile(payload) {
     await request('/api/auth/csrf/')
     const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')

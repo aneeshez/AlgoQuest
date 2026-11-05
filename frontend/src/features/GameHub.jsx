@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { ArrowLeft, ArrowRight, Binary, Braces, GitBranch, Layers3, Network, Play, RotateCcw, Sparkles, Trees, Waypoints, Zap } from 'lucide-react'
 import { buildSortTrace } from './sorting.js'
+import { api } from '../lib/api.js'
 
 const games = [
+  { id: 'quest', title: 'Restore the data relay', topic: 'Story quest', detail: 'Help a town deliver medicine using graphs, queues, and search.', icon: Sparkles, color: 'amber' },
   { id: 'sort', title: 'Sorting master', topic: 'Sorting', detail: 'Compare four sorting strategies step by step.', icon: Layers3, color: 'violet' },
   { id: 'search', title: 'Binary search hunter', topic: 'Arrays', detail: 'Find a hidden target by cutting the range in half.', icon: Binary, color: 'blue' },
   { id: 'stack', title: 'Stack escape', topic: 'Stacks', detail: 'Solve a small puzzle with last in, first out.', icon: Layers3, color: 'rose' },
@@ -14,15 +16,57 @@ const games = [
 ]
 const base = [12, 7, 18, 5, 14, 9]
 
-export default function GameHub() {
+export default function GameHub({ authenticated = false, onQuestReward = () => {}, onRequireAuth = () => {} }) {
   const [game, setGame] = useState('')
   return <div className="gamehub">
     <div className="eyebrow"><span className="eyebrow-line" /> THE TRAINING GROUNDS <span className="eyebrow-line" /></div>
-    {!game ? <><h1>Play your way to <span className="gradient-text">understanding.</span></h1><p className="welcome-sub">Every puzzle makes an algorithm visible. Try a move, see what changes, and learn the rule behind it.</p><div className="gamehub-grid">{games.map(({ id, title, topic, detail, icon: Icon, color }) => <button className="game-tile" key={id} onClick={() => setGame(id)}><div className={`game-tile-icon tone-${color}`}><Icon size={19} /></div><div className="game-tile-topic">{topic}</div><h2>{title}</h2><p>{detail}</p><span className="game-tile-link">Enter game <ArrowRight size={13} /></span></button>)}</div></> : <div className="game-stage"><button className="text-link game-back" onClick={() => setGame('')}><ArrowLeft size={14} /> All games</button>{game === 'sort' ? <SortGame /> : game === 'search' ? <SearchGame /> : game === 'stack' ? <StackGame /> : game === 'queue' ? <QueueGame /> : game === 'list' ? <LinkedListGame /> : game === 'tree' ? <TreeGame /> : game === 'graph' ? <GraphGame /> : <DPGame />}</div>}
+    {!game ? <><h1>Play your way to <span className="gradient-text">understanding.</span></h1><p className="welcome-sub">Every puzzle makes an algorithm visible. Try a move, see what changes, and learn the rule behind it.</p><div className="gamehub-grid">{games.map(({ id, title, topic, detail, icon: Icon, color }) => <button className="game-tile" key={id} onClick={() => setGame(id)}><div className={`game-tile-icon tone-${color}`}><Icon size={19} /></div><div className="game-tile-topic">{topic}</div><h2>{title}</h2><p>{detail}</p><span className="game-tile-link">Enter game <ArrowRight size={13} /></span></button>)}</div></> : <div className="game-stage"><button className="text-link game-back" onClick={() => setGame('')}><ArrowLeft size={14} /> All games</button>{game === 'quest' ? <StoryQuest authenticated={authenticated} onReward={onQuestReward} onRequireAuth={onRequireAuth} /> : game === 'sort' ? <SortGame /> : game === 'search' ? <SearchGame /> : game === 'stack' ? <StackGame /> : game === 'queue' ? <QueueGame /> : game === 'list' ? <LinkedListGame /> : game === 'tree' ? <TreeGame /> : game === 'graph' ? <GraphGame /> : <DPGame />}</div>}
   </div>
 }
 
 function GameCard({ topic, title, intro, children }) { return <section className="game-play-panel"><div className="panel-kicker">{topic.toUpperCase()}</div><h2>{title}</h2><p>{intro}</p>{children}</section> }
+const questStages = [
+  { title: 'Find the clinic', concept: 'BFS · shortest path in an unweighted graph', story: 'The town map connects the Relay to the Clinic through North in two roads, or through East and Market in three. Which search guarantees the route with the fewest roads?', answer: 'bfs', options: [{ id: 'bfs', label: 'Breadth-first search (BFS)' }, { id: 'dfs', label: 'Depth-first search (DFS)' }] },
+  { title: 'Serve the medicine line', concept: 'Queue · first in, first out', story: 'Three clinics call for medicine in this order: Cedar, Birch, Maple. The courier can serve one request at a time. Which structure keeps the arrival order?', answer: 'queue', options: [{ id: 'stack', label: 'A stack: serve the newest request first' }, { id: 'queue', label: 'A queue: serve the oldest request first' }] },
+  { title: 'Locate the final supply box', concept: 'Binary search · halve a sorted range', story: 'Supply IDs are sorted: 14, 21, 28, 35, 42, 49, 56, 63. You check the midpoint, 35, and need ID 49. Which half should you search next?', answer: 'binary-search', options: [{ id: 'left', label: 'Keep the lower half: 14 through 35' }, { id: 'binary-search', label: 'Keep the upper half: 42 through 63' }] },
+]
+
+function StoryQuest({ authenticated, onReward, onRequireAuth }) {
+  const [step, setStep] = useState(0)
+  const [choice, setChoice] = useState('')
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(authenticated)
+  const [busy, setBusy] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState('')
+  useEffect(() => {
+    if (!authenticated) { setLoading(false); return }
+    api.questProgress().then((progress) => { setStep(progress.currentStep); setSaved(progress.completed) }).catch((loadError) => setError(loadError.message)).finally(() => setLoading(false))
+  }, [authenticated])
+  const complete = async () => {
+    if (!choice || busy) return
+    const stage = questStages[step]
+    setBusy(true); setMessage('')
+    try {
+      if (authenticated) {
+        const result = await api.questStep(step, choice)
+        if (!result.correct) { setMessage('That choice does not fit this part of the route. Re-read the scenario and try again.'); return }
+        setStep(result.currentStep); setSaved(result.completed)
+        setMessage(result.completed ? 'The delivery is complete. You earned 15 XP for this story quest.' : result.feedback)
+        if (result.completed && !result.alreadyComplete) onReward()
+      } else if (choice === stage.answer) {
+        const next = step + 1; setStep(next); setMessage(next === questStages.length ? 'The delivery is complete. Sign in to save progress and earn quest XP.' : 'Good call. Move on to the next part of the rescue.')
+      } else setMessage('That choice does not fit this part of the route. Re-read the scenario and try again.')
+      setChoice('')
+    } catch (submitError) { setError(submitError.message) }
+    finally { setBusy(false) }
+  }
+  if (loading) return <div className="game-play-panel">Loading your saved quest…</div>
+  if (error) return <div className="game-play-panel" role="alert">{error}</div>
+  if (step >= questStages.length) return <GameCard topic="STORY QUEST COMPLETE" title="The town is back online." intro="You found the shortest route with BFS, kept medicine requests in FIFO order with a queue, and narrowed the sorted supply list with binary search."><div className="game-feedback"><Sparkles size={14} />{saved ? 'Progress saved. This quest awards 15 XP once per account.' : 'Quest complete.'}</div>{!authenticated && <button className="primary-button mt-4" onClick={onRequireAuth}>Sign in to save progress and earn XP</button>}</GameCard>
+  const current = questStages[step]
+  return <GameCard topic={`STORY QUEST · PART ${step + 1} OF ${questStages.length}`} title="Restore the data relay" intro="A storm has cut the town off from its medicine depot. Use the right data structure at each step to get supplies through safely."><div className="panel-kicker">{current.concept}</div><h3 className="mt-3 text-sm font-semibold">{current.title}</h3><p className="welcome-sub mt-2">{current.story}</p><div className="game-actions mt-4">{current.options.map((option) => <button key={option.id} className={`secondary-button ${choice === option.id ? 'active-game-mode' : ''}`} onClick={() => setChoice(option.id)}>{option.label}</button>)}<button className="primary-button" disabled={!choice || busy} onClick={complete}>{busy ? 'Checking…' : 'Choose this route'} <ArrowRight size={13} /></button></div>{message && <div className="game-feedback mt-4" role="status">{message}</div>}</GameCard>
+}
 function SortGame() {
   const [values, setValues] = useState(base)
   const [algorithm, setAlgorithm] = useState('Bubble sort')

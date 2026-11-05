@@ -23,6 +23,7 @@
 | PointEvent | user_id, source_type, source_id, points, reason, created_at, idempotency_key | Append-only. Enforce one base award per activity. Weekly points are a query over events, not a destructive reset. |
 | Badge | id, slug, name, description, lesson_threshold | Three initial lesson-completion milestones; criteria should be versioned as the catalog grows. |
 | UserBadge | user_id, badge_id, earned_at | Unique on user and badge. |
+| QuestProgress | user_id, quest_slug, current_step, completed_at, updated_at | Unique per learner and quest. Each correct step is persisted; the terminal step awards points once. |
 | Scenario/Game | id, slug, objective, instructions, rules, reward, status | Store content/configuration; interactive mechanics remain frontend code where appropriate. |
 | AdminActionLog | actor_id, target_user_id, action, reason, created_at | Record password-reset support, content publishing, and leaderboard moderation. Avoid secrets and old password data. |
 | LeaderboardReport | reporter_id, nickname snapshot, reason, status, reviewed_by, timestamps | Needed before broad public exposure; rate-limit submissions. |
@@ -56,6 +57,8 @@ Weekly score is the sum of eligible PointEvent values in the active weekly windo
 | POST /api/progress/lessons/{id}/ | Complete, bookmark, unbookmark, or check a lesson. |
 | GET /api/leaderboard/ | Public current-week scores using nickname and earned badge names; excludes email and login username. The current implementation returns the first 100 scores. |
 | POST /api/points/code-task/ | Award 10 XP for one of four visible coding tasks, at most once per task per day and 40 XP per day; authenticated, CSRF protected. The API cannot verify browser results, so this is casual scoring. |
+| GET /api/quests/network-rescue/ | Read the authenticated learner's saved progress for the story quest; anonymous users receive an empty starting state. |
+| POST /api/quests/network-rescue/step/ | Check the current quest choice, save a correct step, and award 15 XP once when all three steps are complete; authenticated, CSRF protected. |
 
 This is a source snapshot, not a guarantee that deployed routes have been verified.
 

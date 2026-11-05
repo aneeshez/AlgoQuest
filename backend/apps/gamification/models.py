@@ -32,3 +32,14 @@ class UserBadge(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=["user", "badge"], name="unique_badge_per_user")]
         ordering = ["earned_at", "badge__lesson_threshold"]
+
+
+class QuestProgress(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="quest_progress")
+    quest_slug = models.SlugField(max_length=80)
+    current_step = models.PositiveSmallIntegerField(default=0)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["user", "quest_slug"], name="unique_user_quest_progress")]
