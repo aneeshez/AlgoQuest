@@ -14,15 +14,15 @@
 | Entity | Key fields | Notes |
 | --- | --- | --- |
 | User | id, username, email, password hash, is_active, is_staff, created_at | Django auth user. Username and email are unique after case normalization. Email is private. |
-| UserProfile | user_id, nickname, total_points, longest_streak, current_streak, last_activity_date, leaderboard_visible, created_at | Add nickname and visibility. Nickname appears publicly; opt-out is recommended but needs user confirmation. |
+| UserProfile | user_id, nickname, total_points, longest_streak, current_streak, last_activity_date, created_at | Nickname is collected at registration and is public on the leaderboard. A visibility opt-out is still a product decision. |
 | LearningSection | id, key, title, description, display_order | Basics, Medium, Advanced. All sections are accessible at launch. |
-| LearningModule | id, section_id, title, slug, summary, difficulty, published_at, is_published | A world/topic grouping. |
+| LearningModule | id, section, title, slug, summary, difficulty, is_published | A world/topic grouping. `section` is Basics, Medium, or Advanced. |
 | Lesson | id, module_id, title, slug, order, duration, objective, concept, analogy, example, steps, Python sample, check, assignment, XP value, status | Answer keys and private editorial notes are never serialized to anonymous callers. |
 | LessonProgress | user_id, lesson_id, completion, bookmark, check attempts, timestamps | Unique on user and lesson. Completion is idempotent. |
 | ActivityAttempt | user_id, activity_id, kind, result summary, attempt_count, created_at | Keep only what is useful for feedback and abuse review; do not store full code by default. |
 | PointEvent | user_id, source_type, source_id, points, reason, created_at, idempotency_key | Append-only. Enforce one base award per activity. Weekly points are a query over events, not a destructive reset. |
-| Badge | id, key, name, description, icon, criteria_version, is_active | Criteria should be versioned and testable. |
-| UserBadge | user_id, badge_id, awarded_at, criteria_snapshot | Unique on user and badge unless repeatable awards are deliberately introduced. |
+| Badge | id, slug, name, description, lesson_threshold | Three initial lesson-completion milestones; criteria should be versioned as the catalog grows. |
+| UserBadge | user_id, badge_id, earned_at | Unique on user and badge. |
 | Scenario/Game | id, slug, objective, instructions, rules, reward, status | Store content/configuration; interactive mechanics remain frontend code where appropriate. |
 | AdminActionLog | actor_id, target_user_id, action, reason, created_at | Record password-reset support, content publishing, and leaderboard moderation. Avoid secrets and old password data. |
 | LeaderboardReport | reporter_id, nickname snapshot, reason, status, reviewed_by, timestamps | Needed before broad public exposure; rate-limit submissions. |
@@ -47,12 +47,14 @@ Weekly score is the sum of eligible PointEvent values in the active weekly windo
 | GET /api/health/ | Service health response. |
 | GET /api/auth/csrf/ | Ensure CSRF cookie and return CSRF token. |
 | GET /api/auth/me/ | Current session/account summary. |
-| POST /api/auth/register/ | Create account using username, email, password. |
+| POST /api/auth/register/ | Create account using username, public nickname, email, and password. |
+| PATCH /api/profile/ | Update the authenticated learner's public nickname; CSRF protected. |
 | POST /api/auth/login/ | Sign in using username/password. |
 | POST /api/auth/logout/ | End session. |
 | GET /api/modules/ | List published modules and lesson summaries. |
 | GET /api/lessons/{slug}/ | Fetch a published lesson. Any section can be opened without completing another section first. |
 | POST /api/progress/lessons/{id}/ | Complete, bookmark, unbookmark, or check a lesson. |
+| GET /api/leaderboard/ | Public current-week scores using nickname and earned badge names; excludes email and login username. The current implementation returns the first 100 scores. |
 
 This is a source snapshot, not a guarantee that deployed routes have been verified.
 
@@ -64,7 +66,7 @@ This is a source snapshot, not a guarantee that deployed routes have been verifi
 | GET /api/modules/{slug}/ | Module details and lesson sequence; public read. |
 | PATCH /api/profile/ | Change own nickname and leaderboard visibility; authenticated, CSRF protected. |
 | GET /api/progress/summary/ | Own completion, lifetime points, badges, and recent activity; authenticated. |
-| GET /api/leaderboard/weekly/ | Current week ranking by points and nickname; authenticated or public-read policy to be confirmed; never includes email. |
+| PATCH /api/profile/ | Change own nickname; add leaderboard visibility only after the opt-out decision is confirmed. |
 | GET /api/badges/ and GET /api/profile/{nickname}/badges/ | Badge catalog and public badge subset; publish only approved fields. |
 | POST /api/activities/{slug}/attempts/ | Record a bounded activity attempt; authenticated and rate-limited. |
 | POST /api/reports/leaderboard/ | Report a nickname; authenticated, throttled, no free-form public comments by default. |

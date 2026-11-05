@@ -5,7 +5,7 @@ import { ArrowRight, Eye, EyeOff, Sparkles, X } from 'lucide-react'
 export default function AuthDialog({ onClose, onSubmit, error, busy, initialMode = 'login' }) {
   const [mode, setMode] = useState(initialMode)
   const [showPassword, setShowPassword] = useState(false)
-  const [form, setForm] = useState({ username: '', email: '', password: '' })
+  const [form, setForm] = useState({ username: '', nickname: '', email: '', password: '' })
   const register = mode === 'register'
   const change = (key) => (event) => setForm((current) => ({ ...current, [key]: event.target.value }))
 
@@ -18,12 +18,13 @@ export default function AuthDialog({ onClose, onSubmit, error, busy, initialMode
       <p>Your learning progress is saved to your account.</p>
       <form onSubmit={(event) => { event.preventDefault(); onSubmit(mode, form) }}>
         <label>Username<input required minLength={3} maxLength={30} autoComplete="username" value={form.username} onChange={change('username')} /></label>
+        {register && <label>Public nickname<input required minLength={3} maxLength={24} autoComplete="nickname" value={form.nickname} onChange={change('nickname')} /><small>This is the name other learners see on the leaderboard.</small></label>}
         {register && <label>Email address<input required type="email" autoComplete="email" value={form.email} onChange={change('email')} /></label>}
         <label>Password<div className="password-input"><input required minLength={register ? 10 : undefined} type={showPassword ? 'text' : 'password'} autoComplete={register ? 'new-password' : 'current-password'} value={form.password} onChange={change('password')} /><button type="button" aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword(!showPassword)}>{showPassword ? <EyeOff size={15} /> : <Eye size={15} />}</button></div>{register && <small>Use at least 10 characters.</small>}</label>
         {error && <div className="auth-error" role="alert">{error}</div>}
         <button className="primary-button auth-submit" disabled={busy}>{busy ? 'Working…' : register ? 'Create account' : 'Sign in'} <ArrowRight size={15} /></button>
       </form>
-      <div className="auth-switch">{register ? 'Already have an account?' : 'New to AlgoQuest?'} <button onClick={() => { setMode(register ? 'login' : 'register'); setForm({ username: '', email: '', password: '' }) }}>{register ? 'Sign in' : 'Create an account'}</button></div>
+      <div className="auth-switch">{register ? 'Already have an account?' : 'New to AlgoQuest?'} <button onClick={() => { setMode(register ? 'login' : 'register'); setForm({ username: '', nickname: '', email: '', password: '' }) }}>{register ? 'Sign in' : 'Create an account'}</button></div>
     </motion.section>
   </motion.div></AnimatePresence>
 }

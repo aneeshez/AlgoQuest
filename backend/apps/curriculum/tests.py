@@ -3,6 +3,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from apps.accounts.models import UserProfile
 from apps.gamification.models import XPTransaction
+from apps.gamification.models import Badge, UserBadge
 from .models import LearningModule, Lesson, LessonProgress
 
 class LessonProgressTests(TestCase):
@@ -34,6 +35,7 @@ class LessonProgressTests(TestCase):
         self.assertEqual(UserProfile.objects.get(user=self.user).total_xp, 20)
         self.assertEqual(XPTransaction.objects.filter(user=self.user).count(), 1)
         self.assertEqual(LessonProgress.objects.filter(user=self.user).count(), 1)
+        self.assertEqual(list(UserBadge.objects.filter(user=self.user).values_list("badge__slug", flat=True)), ["first-steps"])
 
     def test_check_returns_explanation_without_exposing_answer_in_lesson_json(self):
         lesson_data = APIClient().get(f"/api/lessons/{self.lesson.slug}/").json()

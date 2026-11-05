@@ -9,6 +9,12 @@ export const api = {
   me: () => request('/api/auth/me/'),
   csrf: () => request('/api/auth/csrf/'),
   modules: () => request('/api/modules/'),
+  leaderboard: () => request('/api/leaderboard/'),
+  async updateProfile(payload) {
+    await request('/api/auth/csrf/')
+    const csrf = document.cookie.split('; ').find((entry) => entry.startsWith('csrftoken='))?.split('=').slice(1).join('=')
+    return request('/api/profile/', { method: 'PATCH', headers: { 'X-CSRFToken': decodeURIComponent(csrf || '') }, body: JSON.stringify(payload) })
+  },
   lesson: (slug) => request(`/api/lessons/${slug}/`),
   async progress(id, payload) {
     await request('/api/auth/csrf/')

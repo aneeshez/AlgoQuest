@@ -10,7 +10,7 @@ import CodingArena from '../features/CodingArena.jsx'
 import LandingPage from '../features/LandingPage.jsx'
 
 const nav = [
-  { name: 'Home base', icon: Compass }, { name: 'Learning path', icon: GitBranch }, { name: 'Coding arena', icon: Code2 }, { name: 'Mini-games', icon: Gamepad2 },
+  { name: 'Home base', icon: Compass }, { name: 'Learning path', icon: GitBranch }, { name: 'Leaderboard', icon: Trophy }, { name: 'Coding arena', icon: Code2 }, { name: 'Mini-games', icon: Gamepad2 },
 ]
 const initial = [12, 7, 18, 5, 14, 9]
 
@@ -31,11 +31,19 @@ function App() {
   const [curriculumLoading, setCurriculumLoading] = useState(true)
   const [curriculumError, setCurriculumError] = useState('')
   const [selectedLesson, setSelectedLesson] = useState('')
+  const [leaderboard, setLeaderboard] = useState(null)
+  const [leaderboardLoading, setLeaderboardLoading] = useState(false)
+  const [leaderboardError, setLeaderboardError] = useState('')
 
   useEffect(() => {
     api.me().then((data) => { setAccount(data); if (data.authenticated) setActive('Home base') }).catch(() => {})
     loadCurriculum()
   }, [])
+  useEffect(() => {
+    if (active !== 'Leaderboard') return
+    setLeaderboardLoading(true); setLeaderboardError('')
+    api.leaderboard().then(setLeaderboard).catch((error) => setLeaderboardError(error.message)).finally(() => setLeaderboardLoading(false))
+  }, [active])
   const loadCurriculum = async () => {
     setCurriculumLoading(true); setCurriculumError('')
     try { const data = await api.modules(); setApiModules(data.results || data) }
@@ -57,6 +65,11 @@ function App() {
       showNotice(`Welcome${mode === 'register' ? ' to AlgoQuest' : ' back'}, ${data.user.username}.`)
     } catch (error) { setAuthError(error.message) }
     finally { setAuthBusy(false) }
+  }
+  const saveNickname = async (nickname) => {
+    const data = await api.updateProfile({ nickname })
+    setAccount((current) => current ? { ...current, profile: { ...current.profile, nickname: data.nickname } } : current)
+    showNotice('Your public nickname has been updated.')
   }
   const signOut = async () => {
     try { await api.auth('logout'); setAccount(null); setActive('Landing'); loadCurriculum(); showNotice('You are signed out.') }
@@ -88,7 +101,7 @@ function App() {
         {active !== 'Landing' && <header className="topbar"><button className="icon-button mobile-menu" aria-label="Open menu" onClick={() => setCollapsed(!collapsed)}><Menu size={19} /></button><div className="breadcrumbs"><span>Workspace</span><ChevronRight size={14} /><strong>{active}</strong></div><div className="top-actions"><button className="search-button" onClick={() => setSearchOpen(true)}><Search size={15} /><span>Search</span><kbd>⌘ K</kbd></button>{account?.authenticated && <><div className="xp-pill"><Zap size={14} fill="currentColor" /> {account.profile.totalXp} <span>XP</span></div><button className="streak-pill" aria-label={`${account.profile.streakDays} day streak`}><Flame size={16} fill="currentColor" /> {account.profile.streakDays}</button></>}<button className="top-avatar" aria-label={account?.authenticated ? 'Sign out' : 'Sign in'} title={account?.authenticated ? 'Sign out' : 'Sign in'} onClick={() => account?.authenticated ? signOut() : openLogin()}>{account?.user?.username?.[0]?.toUpperCase() || 'G'}</button></div></header>}
         <div className={`content-wrap ${active === 'Landing' ? 'landing-content-wrap' : ''}`}>
           <AnimatePresence mode="wait"><motion.div key={active} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: .2 }}>
-            {active === 'Landing' ? <LandingPage onRegister={openRegister} onLogin={openLogin} onPath={() => navigate('Learning path')} onGames={() => navigate('Mini-games')} /> : active === 'Home base' ? <Dashboard account={account} apiModules={apiModules} onNavigate={navigate} onOpenLesson={openLesson} showNotice={showNotice} sort={sort} setSort={(value) => { setSort(value); setSortStep(0) }} numbers={frame.values} sortStep={sortStep} traceLength={trace.length} comparisons={frame.comparisons} swaps={frame.swaps} pair={frame.pair} nextSortStep={nextSortStep} randomize={randomize} /> : active === 'Learning path' ? <Roadmap onSelect={(module) => openLesson(module.lessons.find((lesson) => !lesson.completed) || module.lessons[0])} apiModules={apiModules} loading={curriculumLoading} error={curriculumError} onRetry={loadCurriculum} /> : active === 'Lesson' ? <LessonPage slug={selectedLesson} modules={apiModules} authenticated={!!account?.authenticated} onRequireAuth={openLogin} onNavigateLesson={setSelectedLesson} onBack={() => navigate('Learning path')} onOpenArena={() => navigate('Coding arena')} onComplete={() => { api.me().then(setAccount).catch(() => {}); loadCurriculum() }} /> : active === 'Mini-games' ? <GameHub /> : active === 'Coding arena' ? <CodingArena /> : <ComingSoon name={active} onBack={() => navigate('Home base')} />}
+            {active === 'Landing' ? <LandingPage onRegister={openRegister} onLogin={openLogin} onPath={() => navigate('Learning path')} onGames={() => navigate('Mini-games')} /> : active === 'Home base' ? <Dashboard account={account} apiModules={apiModules} onNavigate={navigate} onOpenLesson={openLesson} showNotice={showNotice} sort={sort} setSort={(value) => { setSort(value); setSortStep(0) }} numbers={frame.values} sortStep={sortStep} traceLength={trace.length} comparisons={frame.comparisons} swaps={frame.swaps} pair={frame.pair} nextSortStep={nextSortStep} randomize={randomize} /> : active === 'Learning path' ? <Roadmap onSelect={(module) => openLesson(module.lessons.find((lesson) => !lesson.completed) || module.lessons[0])} apiModules={apiModules} loading={curriculumLoading} error={curriculumError} onRetry={loadCurriculum} /> : active === 'Lesson' ? <LessonPage slug={selectedLesson} modules={apiModules} authenticated={!!account?.authenticated} onRequireAuth={openLogin} onNavigateLesson={setSelectedLesson} onBack={() => navigate('Learning path')} onOpenArena={() => navigate('Coding arena')} onComplete={() => { api.me().then(setAccount).catch(() => {}); loadCurriculum() }} /> : active === 'Leaderboard' ? <Leaderboard data={leaderboard} loading={leaderboardLoading} error={leaderboardError} account={account} onSaveNickname={saveNickname} /> : active === 'Mini-games' ? <GameHub /> : active === 'Coding arena' ? <CodingArena /> : <ComingSoon name={active} onBack={() => navigate('Home base')} />}
           </motion.div></AnimatePresence>
         </div>
       </main>
@@ -125,6 +138,20 @@ function Dashboard({ account, apiModules, onNavigate, onOpenLesson, showNotice, 
 
 function Stat({ icon: Icon, label, value, suffix, tone, detail }) { return <div className="stat-card"><div className={`stat-icon stat-${tone}`}><Icon size={16} /></div><div className="stat-label">{label}</div><div className="stat-number">{value}<span>{suffix}</span></div><div className="stat-detail">{detail}</div></div> }
 function CheckIcon() { return <span aria-hidden="true">✓</span> }
+function Leaderboard({ data, loading, error, account, onSaveNickname }) {
+  return <section className="roadmap-page"><div className="eyebrow"><span className="eyebrow-line" /> THIS WEEK'S QUEST <span className="eyebrow-line" /></div><h1>Weekly <span className="gradient-text">leaderboard.</span></h1><p className="welcome-sub">Earn points by completing lessons. Your login name and email stay private.</p>{account?.authenticated && <NicknameEditor nickname={account.profile.nickname} onSave={onSaveNickname} />}{loading ? <div className="panel mt-5 p-5">Loading this week's scores…</div> : error ? <div className="panel mt-5 p-5" role="alert">{error}</div> : <><div className="panel mt-5 p-4"><div className="panel-kicker">WEEK STARTING {data?.weekStart || ''} · {data?.timezone || ''}</div>{data?.entries?.length ? <ol className="roadmap-list mt-4">{data.entries.map((entry) => <li key={`${entry.rank}-${entry.nickname}`} className="module-row module-current"><div className="module-number tone-violet">{entry.rank}</div><div className="module-main"><h2>{entry.nickname}</h2><div className="flex flex-wrap gap-2 mt-2">{entry.badges.map((badge) => <span className="mission-reward" key={badge.slug}><Award size={12} className="inline" /> {badge.name}</span>)}</div></div><div className="module-lessons"><Zap size={14} />{entry.weeklyXp} XP</div></li>)}</ol> : <p className="welcome-sub mt-4">No scores yet this week. Complete a lesson to claim the first spot.</p>}</div><p className="welcome-sub mt-4">Casual points reset each Monday. They are based on browser-checked activities and are not cheat-proof.</p></>}</section>
+}
+function NicknameEditor({ nickname, onSave }) {
+  const [value, setValue] = useState(nickname || '')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  useEffect(() => setValue(nickname || ''), [nickname])
+  const submit = async (event) => {
+    event.preventDefault(); setBusy(true); setError('')
+    try { await onSave(value) } catch (saveError) { setError(saveError.message) } finally { setBusy(false) }
+  }
+  return <form className="panel mt-5 flex flex-wrap items-end gap-3 p-4" onSubmit={submit}><label className="module-main">Your public nickname<input required minLength={3} maxLength={24} value={value} onChange={(event) => setValue(event.target.value)} /></label><button className="primary-button" disabled={busy}>{busy ? 'Saving…' : 'Update nickname'}</button>{error && <span role="alert" className="auth-error">{error}</span>}</form>
+}
 function ActivityChart({ data }) { const max = Math.max(1, ...data.map((day) => day.xp)); return <div className="activity-chart">{data.map((day, i) => <div key={day.date} className="chart-day" title={`${day.date}: ${day.xp} XP`}><div className="chart-bar-track"><span style={{ height: `${day.xp ? Math.max(8, day.xp / max * 100) : 0}%` }} className={i === data.length - 1 ? 'chart-bar today' : 'chart-bar'} /></div><span>{day.label?.[0] || ''}</span></div>)}</div> }
 function SearchDialog({ modules: source, onClose, onSelect }) {
   const [query, setQuery] = useState('')

@@ -7,6 +7,7 @@ from .models import LearningModule, Lesson, LessonProgress
 from .serializers import LessonSerializer, ModuleSerializer
 from apps.accounts.models import UserProfile
 from apps.gamification.models import XPTransaction
+from apps.gamification.services import award_lesson_badges
 
 class ModuleList(generics.ListAPIView):
     queryset = LearningModule.objects.filter(is_published=True).prefetch_related("lessons")
@@ -51,4 +52,6 @@ def lesson_progress(request, pk):
             profile = UserProfile.objects.select_for_update().get(user=request.user)
             profile.total_xp = sum(request.user.xp_transactions.values_list("amount", flat=True))
             profile.save(update_fields=["total_xp"])
+        if action == "complete":
+            award_lesson_badges(request.user)
     return Response({"completed": bool(progress.completed_at), "bookmarked": progress.bookmarked, "totalXp": request.user.profile.total_xp})

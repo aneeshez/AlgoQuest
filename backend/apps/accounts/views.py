@@ -1,4 +1,5 @@
 import json
+import re
 from functools import wraps
 from datetime import timedelta
 from django.contrib.auth import authenticate, login, logout
@@ -14,7 +15,8 @@ from django.middleware.csrf import get_token
 from django.core.validators import validate_email
 from django.utils import timezone
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from django.views.decorators.csrf import csrf_protect
 
 def _body(request):
     try:
@@ -22,13 +24,16 @@ def _body(request):
     except (json.JSONDecodeError, UnicodeDecodeError):
         return None
 
+def _valid_nickname(value):
+    return 3 <= len(value) <= 24 and re.fullmatch(r"[\w -]+", value, flags=re.UNICODE) is not None
+
 def _account_response(user):
     profile = user.profile
     today = timezone.localdate()
     start = today - timedelta(days=6)
     daily = {row["day"].isoformat(): row["total"] for row in user.xp_transactions.filter(created_at__date__gte=start).annotate(day=TruncDate("created_at")).values("day").annotate(total=Sum("amount"))}
     weekly_activity = [{"date": (start + timedelta(days=index)).isoformat(), "label": (start + timedelta(days=index)).strftime("%a"), "xp": daily.get((start + timedelta(days=index)).isoformat(), 0)} for index in range(7)]
-    return JsonResponse({"authenticated": True, "user": {"id": user.id, "username": user.username, "email": user.email, "isStaff": user.is_staff}, "profile": {"totalXp": profile.total_xp, "streakDays": profile.streak_days, "longestStreak": profile.longest_streak, "weeklyActivity": weekly_activity}})
+    return JsonResponse({"authenticated": True, "user": {"id": user.id, "username": user.username, "email": user.email, "isStaff": user.is_staff}, "profile": {"nickname": profile.nickname, "totalXp": profile.total_xp, "streakDays": profile.streak_days, "longestStreak": profile.longest_streak, "weeklyActivity": weekly_activity}})
 
 def auth_rate_limit(view):
     @wraps(view)
@@ -63,10 +68,13 @@ def register(request):
     if data is None:
         return JsonResponse({"detail": "Send valid JSON."}, status=400)
     username = str(data.get("username", "")).strip()
+    nickname = str(data.get("nickname", "")).strip()
     email = str(data.get("email", "")).strip().lower()
     password = data.get("password", "")
     if len(username) < 3 or len(username) > 30:
         return JsonResponse({"detail": "Username must be 3 to 30 characters."}, status=400)
+    if not _valid_nickname(nickname):
+        return JsonResponse({"detail": "Nickname must be 3 to 24 characters and use letters, numbers, spaces, hyphens, or underscores."}, status=400)
     if User.objects.filter(username__iexact=username).exists():
         return JsonResponse({"detail": "That username is already taken."}, status=400)
     if not email or User.objects.filter(email__iexact=email).exists():
@@ -81,6 +89,8 @@ def register(request):
         return JsonResponse({"detail": " ".join(exc.messages)}, status=400)
     with transaction.atomic():
         user = User.objects.create_user(username=username, email=email, password=password)
+        user.profile.nickname = nickname
+        user.profile.save(update_fields=["nickname"])
     login(request, user)
     return _account_response(user)
 
@@ -100,3 +110,18 @@ def sign_in(request):
 def sign_out(request):
     logout(request)
     return JsonResponse({"authenticated": False})
+
+@csrf_protect
+@require_http_methods(["PATCH"])
+def update_profile(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"detail": "Sign in to update your nickname."}, status=401)
+    data = _body(request)
+    if data is None:
+        return JsonResponse({"detail": "Send valid JSON."}, status=400)
+    nickname = str(data.get("nickname", "")).strip()
+    if not _valid_nickname(nickname):
+        return JsonResponse({"detail": "Nickname must be 3 to 24 characters and use letters, numbers, spaces, hyphens, or underscores."}, status=400)
+    request.user.profile.nickname = nickname
+    request.user.profile.save(update_fields=["nickname"])
+    return JsonResponse({"nickname": nickname})

@@ -31,7 +31,7 @@ This log captures user-confirmed decisions and proposed defaults. A proposed def
 | ID | Proposed default | Why it is useful |
 | --- | --- | --- |
 | P-01 | Allow self-registration, with leaderboard visibility limited to registered users. | Fits an open leaderboard while keeping private data behind accounts. |
-| P-02 | Use Monday 00:00 in the configured product timezone as the weekly score boundary. | Gives all learners one understandable and testable week window. |
+| P-02 | Use Monday 00:00 in the configured product timezone as the weekly score boundary. | Implemented using the current Asia/Kolkata timezone; confirm this product choice before launch. |
 | P-03 | Keep earned badges and lifetime points permanently; reset only the weekly leaderboard aggregation. | Preserves achievement history while giving weekly newcomers a fresh contest. |
 | P-04 | Provide a learner opt-out from public leaderboard display while still allowing course participation. | Protects privacy without removing the global leaderboard. |
 | P-05 | Use a minimum of four fully edited lessons and one aligned interactive activity per section for the first limited beta. | Keeps all three sections useful without publishing draft content. |
